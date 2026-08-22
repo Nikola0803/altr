@@ -22,7 +22,7 @@ export function Testimonials() {
         <div className="flex items-center justify-center gap-3 text-sm text-white/70">
           <span className="font-display text-xl font-bold text-white">4.9 / 5</span>
           <span className="h-1 w-1 rounded-full bg-white/30" />
-          <span>4,000+ Orders</span>
+          <span>150+ Researchers</span>
         </div>
 
         <p className="mt-12 font-display text-2xl font-medium leading-snug md:text-4xl">&ldquo;{current.quote}&rdquo;</p>
