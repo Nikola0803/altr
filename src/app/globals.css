@@ -1,26 +1,174 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-ivory: #f4f0e7;
+  --color-ivory-soft: #faf8f3;
+  --color-sage: #687767;
+  --color-sage-deep: #536252;
+  --color-sage-light: #97a494;
+  --color-sage-mist: #e7e9e2;
+  --color-charcoal: #10130f;
+  --color-stone: #d8d3c9;
+  --color-white: #ffffff;
+  --color-sage-forest: #10130f;
+  --color-soft-gray: #777970;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ivory: var(--color-ivory);
+  --color-ivory-soft: var(--color-ivory-soft);
+  --color-sage: var(--color-sage);
+  --color-sage-deep: var(--color-sage-deep);
+  --color-sage-light: var(--color-sage-light);
+  --color-sage-mist: var(--color-sage-mist);
+  --color-charcoal: var(--color-charcoal);
+  --color-stone: var(--color-stone);
+  --color-sage-forest: var(--color-sage-forest);
+  --color-soft-gray: var(--color-soft-gray);
+  --font-display: var(--font-space-grotesk);
+  --font-body: var(--font-inter);
+  --font-accent: var(--font-accent);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--color-stone);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ivory);
+  color: var(--color-charcoal);
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--color-sage);
+  color: var(--color-ivory);
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-ivory);
+}
+
+.font-accent {
+  font-family: var(--font-accent), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.grain-texture {
+  position: relative;
+}
+
+.grain-texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: radial-gradient(circle at 20% 20%, rgba(244, 240, 231, 0.10) 0, transparent 45%),
+    radial-gradient(circle at 80% 0%, rgba(244, 240, 231, 0.08) 0, transparent 40%),
+    radial-gradient(circle at 60% 80%, rgba(244, 240, 231, 0.08) 0, transparent 45%);
+}
+
+@keyframes hero-glow-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.9; }
+  50% { transform: translate3d(-2%, 3%, 0) scale(1.08); opacity: 1; }
+}
+
+@keyframes hero-glow-drift-alt {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.85; }
+  50% { transform: translate3d(3%, -2%, 0) scale(1.05); opacity: 1; }
+}
+
+.hero-glow-a {
+  animation: hero-glow-drift 14s ease-in-out infinite;
+}
+
+.hero-glow-b {
+  animation: hero-glow-drift-alt 18s ease-in-out infinite;
+}
+
+@keyframes droplet-twinkle {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.5; }
+}
+
+.droplet-field circle {
+  animation: droplet-twinkle 6s ease-in-out infinite;
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.hero-float {
+  animation: hero-float 6s ease-in-out infinite;
+}
+
+@keyframes hero-bubble-rise {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+.hero-bubble {
+  animation: hero-bubble-rise 9s ease-in-out infinite;
+}
+
+@keyframes hero-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.hero-spin {
+  animation: hero-spin 12s linear infinite;
+}
+
+@keyframes hero-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.hero-pulse {
+  animation: hero-pulse 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-glow-a,
+  .hero-glow-b,
+  .hero-float,
+  .hero-bubble,
+  .hero-spin,
+  .hero-pulse,
+  .droplet-field circle {
+    animation: none !important;
+  }
+}
+
+.container-altr {
+  max-width: 1360px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .container-altr {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
 }
