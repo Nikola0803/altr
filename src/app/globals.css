@@ -134,7 +134,7 @@ body {
 }
 
 .hero-spin {
-  animation: hero-spin 12s linear infinite;
+  animation: hero-spin 8s linear infinite !important;
 }
 
 @keyframes hero-pulse {
@@ -151,7 +151,6 @@ body {
   .hero-glow-b,
   .hero-float,
   .hero-bubble,
-  .hero-spin,
   .hero-pulse,
   .droplet-field circle {
     animation: none !important;
