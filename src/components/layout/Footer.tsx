@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
+import { NewsletterForm } from "./NewsletterForm";
 
 const SHOP_NAV = [
   { href: "/shop", label: "Shop" },
@@ -44,6 +45,8 @@ export function Footer() {
               </li>
             ))}
           </FooterColumn>
+
+          <NewsletterForm />
         </div>
       </div>
 
