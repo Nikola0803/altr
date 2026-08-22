@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/lib/types";
@@ -19,10 +20,30 @@ export function ProductCard({ product }: { product: Product }) {
   const { packIndex, setPackIndex, packs, selected } = usePackSelection(product);
   const { addToCart } = useCart();
   const { title, dosage } = splitDosage(product.name);
+  const [hovering, setHovering] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  function handleEnter() {
+    setHovering(true);
+    videoRef.current?.play().catch(() => {});
+  }
+
+  function handleLeave() {
+    setHovering(false);
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  }
 
   return (
     <div className="group flex flex-col">
-      <Link href={`/shop/${product.slug}`} className="relative block overflow-hidden rounded-lg bg-ivory-soft">
+      <Link
+        href={`/shop/${product.slug}`}
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+        className="relative block overflow-hidden rounded-lg bg-ivory-soft"
+      >
         <div className="aspect-[4/5] w-full">
           {product.image ? (
             <Image
@@ -31,11 +52,26 @@ export function ProductCard({ product }: { product: Product }) {
               width={600}
               height={750}
               sizes="(max-width: 768px) 45vw, 320px"
-              className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
+              className={`h-full w-full object-cover transition-opacity duration-500 ${hovering ? "opacity-0" : "opacity-100"}`}
             />
           ) : (
-            <ProductVisual name={title} dosage={dosage} floating className="h-full w-full p-6 transition duration-700 ease-out group-hover:scale-[1.04]" />
+            <ProductVisual
+              name={title}
+              dosage={dosage}
+              floating
+              className={`h-full w-full p-6 transition-opacity duration-500 ${hovering ? "opacity-0" : "opacity-100"}`}
+            />
           )}
+          <video
+            ref={videoRef}
+            muted
+            loop
+            playsInline
+            preload="none"
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${hovering ? "opacity-100" : "opacity-0"}`}
+          >
+            <source src="/videos/product-hover.mp4" type="video/mp4" />
+          </video>
         </div>
         {product.badges?.map((badge) => (
           <span key={badge} className="absolute left-3 top-3 text-[10px] font-semibold uppercase tracking-wider text-sage-deep">

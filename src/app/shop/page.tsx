@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Metadata } from "next";
 import { getProducts } from "@/lib/products";
 import { ShopClient } from "./ShopClient";
@@ -20,7 +21,9 @@ export default function ShopPage() {
 
   return (
     <>
-      <ShopClient products={products} />
+      <Suspense fallback={null}>
+        <ShopClient products={products} />
+      </Suspense>
       <TrustIconRow items={SHOP_TRUST_ITEMS} tone="plain" />
     </>
   );
