@@ -2,7 +2,7 @@ import { ButtonLink } from "@/components/ui/Button";
 
 export function Hero() {
   return (
-    <section className="relative -mt-[90px] flex min-h-[92vh] items-center overflow-hidden bg-charcoal md:-mt-[100px]">
+    <section className="hero-viewport relative -mt-[90px] flex items-center overflow-hidden bg-charcoal md:-mt-[100px]">
       <video
         autoPlay
         loop

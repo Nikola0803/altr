@@ -36,12 +36,14 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   background: var(--color-ivory);
   color: var(--color-charcoal);
   font-family: var(--font-body), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 ::selection {
@@ -155,6 +157,11 @@ body {
   .droplet-field circle {
     animation: none !important;
   }
+}
+
+.hero-viewport {
+  min-height: 92vh;
+  min-height: 92dvh;
 }
 
 .container-altr {

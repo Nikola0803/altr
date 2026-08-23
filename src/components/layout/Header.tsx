@@ -34,17 +34,17 @@ export function Header() {
           <button type="button" className="hidden h-9 w-9 items-center justify-center text-white/85 transition hover:text-white md:flex" aria-label="Search">
             <i className="ri-search-line text-base" />
           </button>
-          <Link href="/shop" className="relative flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white" aria-label="Cart">
+          <Link href="/shop" className="relative flex h-11 w-11 items-center justify-center text-white/85 transition hover:text-white md:h-9 md:w-9" aria-label="Cart">
             <i className="ri-shopping-bag-line text-base" />
             {count > 0 && (
-              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-sage text-[10px] font-semibold text-white">
+              <span className="absolute right-1 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-sage text-[10px] font-semibold text-white md:right-0 md:top-0">
                 {count}
               </span>
             )}
           </Link>
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white md:hidden"
+            className="flex h-11 w-11 items-center justify-center text-white/85 transition hover:text-white md:hidden"
             aria-label="Menu"
             onClick={() => setOpen((v) => !v)}
           >
