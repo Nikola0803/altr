@@ -19,7 +19,7 @@ function splitDosage(name: string) {
 
 const TRUST_ITEMS = [
   { icon: "ri-shield-check-line", title: "Independently Verified", subtitle: "Independent lab testing" },
-  { icon: "ri-truck-line", title: "Free Shipping", subtitle: "Orders over $300 CAD" },
+  { icon: "ri-truck-line", title: "Free Shipping", subtitle: "Orders over $400 CAD" },
   { icon: "ri-lock-line", title: "Secure Checkout", subtitle: "256-bit encryption" },
   { icon: "ri-refresh-line", title: "Satisfaction Guaranteed", subtitle: "Quality assured" },
 ];
@@ -31,7 +31,7 @@ export function ProductClient({ product }: { product: Product }) {
   const { addToCart } = useCart();
 
   const lineTotal = selected.unitPrice * qty * selected.qty;
-  const shippingThreshold = 300;
+  const shippingThreshold = 400;
   const shippingProgress = Math.min(100, (lineTotal / shippingThreshold) * 100);
   const shippingRemaining = Math.max(0, shippingThreshold - lineTotal);
   const { title, dosage } = splitDosage(product.name);
@@ -154,7 +154,7 @@ export function ProductClient({ product }: { product: Product }) {
           <div className="h-2 overflow-hidden rounded-full bg-stone">
             <div className="h-full rounded-full bg-sage transition-all duration-500" style={{ width: `${shippingProgress}%` }} />
           </div>
-          <p className="mt-2 text-xs text-charcoal/50">Free express shipping on all orders over $300 CAD</p>
+          <p className="mt-2 text-xs text-charcoal/50">Free express shipping on all orders over $400 CAD</p>
         </div>
 
         <div className="mt-10 border-t border-stone">

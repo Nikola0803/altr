@@ -68,14 +68,22 @@ style, so ask whether to use that or wait for a photo.
 Real product photos live in `public/images/products/` — filename convention is the product slug minus dosage,
 e.g. `bpc-157.jpg`, `retatrutide.jpg`. Wired via the optional `image` field on `Product`.
 
-Currently 60 products, all with real photography (14 original `.jpg` shots + 46 `.png` label renders added
-2026-08-23). Categories: `peptides`, `growth-hormone` (secretagogues/GH-axis: CJC-1295 variants, GHRP-2/6,
-Hexarelin, Ipamorelin, IGF-1 variants, MGF/PEG-MGF), `ancillaries` (GHK-Cu, AHK-Cu, Glutathione, NAD+,
-Bacteriostatic Water).
+Currently 59 products, all with real photography (13 original `.jpg` shots + 46 `.png` label renders added
+2026-08-23). Categories: `peptides`, `ancillaries` (GHK-Cu, AHK-Cu, Glutathione, NAD+, Bacteriostatic Water) —
+that's it, only two categories.
 
 **Prices, purity %, ratings, review counts are all placeholder mock data** — flagged repeatedly, not real.
 Same for testimonials (`src/lib/content.ts`) and the "150+ Researchers" / "4.9/5" stats — swap for real data
 before this goes fully live, or be upfront with customers that it's illustrative.
+
+**No HGH, no HCG, no "growth hormone" language anywhere on the site — this is a hard brand rule, not a
+preference.** HGH/HCG are explicitly excluded from the catalog because they're black-market territory the client
+wants zero association with (a competitor built their whole brand on it — ALTR deliberately does not). This
+covers: no HGH/HCG product listings, no "growth hormone" category, and no product copy that spells out "growth
+hormone" even for legitimate GH-axis secretagogues (GHRP-2/6, Hexarelin, Ipamorelin, CJC-1295, IGF-1 variants,
+MGF/PEG-MGF, AOD-9604) — those stay in the `peptides` category and their descriptions use neutral terms like
+"secretagogue" instead. If asked to add a new product, check it isn't HGH/HCG and that its description doesn't
+say "growth hormone" before adding it.
 
 ## Media assets
 

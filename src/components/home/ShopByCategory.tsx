@@ -4,7 +4,7 @@ const CATEGORIES = [
   { title: "Recovery & Tissue Research", compounds: "BPC-157 · TB-500", href: "/shop?category=peptides", art: "botanical" as const },
   { title: "Metabolic Research", compounds: "Semaglutide · Tirzepatide · Retatrutide", href: "/shop?category=peptides", art: "droplet" as const },
   { title: "Cellular & Longevity Research", compounds: "MOTS-C · NAD+ · GHK-Cu", href: "/shop?category=ancillaries", art: "molecular" as const },
-  { title: "Growth Hormone Research", compounds: "CJC-1295 · Ipamorelin · Tesamorelin", href: "/shop?category=growth-hormone", art: "sculptural" as const },
+  { title: "Nootropic & Cognitive Research", compounds: "Semax · Selank · Dihexa", href: "/shop?category=peptides", art: "sculptural" as const },
 ];
 
 export function ShopByCategory() {

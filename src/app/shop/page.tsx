@@ -6,7 +6,7 @@ import { TrustIconRow } from "@/components/ui/TrustIconRow";
 
 export const metadata: Metadata = {
   title: "Shop | ALTR",
-  description: "Browse the full ALTR catalogue of research peptides, growth hormone kits and ancillaries.",
+  description: "Browse the full ALTR catalogue of research peptides and ancillaries.",
 };
 
 const SHOP_TRUST_ITEMS = [
