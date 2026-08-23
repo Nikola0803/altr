@@ -68,8 +68,10 @@ style, so ask whether to use that or wait for a photo.
 Real product photos live in `public/images/products/` — filename convention is the product slug minus dosage,
 e.g. `bpc-157.jpg`, `retatrutide.jpg`. Wired via the optional `image` field on `Product`.
 
-Currently 14 products, all with real photography: BPC-157 10MG, Retatrutide, Tesamorelin, GHK-Cu, MOTS-C,
-5-Amino-1MQ, HGH 24IU, Thymosin Alpha-1, Wolverine Stack, GLOW, Sermorelin, KLOW, Selank, CJC-1295 without DAC.
+Currently 60 products, all with real photography (14 original `.jpg` shots + 46 `.png` label renders added
+2026-08-23). Categories: `peptides`, `growth-hormone` (secretagogues/GH-axis: CJC-1295 variants, GHRP-2/6,
+Hexarelin, Ipamorelin, IGF-1 variants, MGF/PEG-MGF), `ancillaries` (GHK-Cu, AHK-Cu, Glutathione, NAD+,
+Bacteriostatic Water).
 
 **Prices, purity %, ratings, review counts are all placeholder mock data** — flagged repeatedly, not real.
 Same for testimonials (`src/lib/content.ts`) and the "150+ Researchers" / "4.9/5" stats — swap for real data
