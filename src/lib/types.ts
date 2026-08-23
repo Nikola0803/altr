@@ -10,6 +10,8 @@ export interface Product {
   id: string;
   slug: string;
   sku: string;
+  /** Real WooCommerce product_id, set once this catalog is imported into a live WooCommerce store. Required for checkout. */
+  wooProductId?: number;
   name: string;
   category: ProductCategory;
   categoryLabel: string;

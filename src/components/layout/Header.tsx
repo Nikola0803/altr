@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { useCart } from "@/lib/cart-context";
+import { SearchOverlay } from "./SearchOverlay";
 
 const NAV = [
   { href: "/shop", label: "Shop" },
@@ -15,7 +16,8 @@ const NAV = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const { count } = useCart();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const { count, openCart } = useCart();
 
   return (
     <header className="fixed top-[32px] right-0 left-0 z-50 bg-charcoal/20 backdrop-blur-sm">
@@ -31,17 +33,27 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1 md:gap-2">
-          <button type="button" className="hidden h-9 w-9 items-center justify-center text-white/85 transition hover:text-white md:flex" aria-label="Search">
+          <button
+            type="button"
+            className="flex h-11 w-11 items-center justify-center text-white/85 transition hover:text-white md:h-9 md:w-9"
+            aria-label="Search"
+            onClick={() => setSearchOpen(true)}
+          >
             <i className="ri-search-line text-base" />
           </button>
-          <Link href="/shop" className="relative flex h-11 w-11 items-center justify-center text-white/85 transition hover:text-white md:h-9 md:w-9" aria-label="Cart">
+          <button
+            type="button"
+            className="relative flex h-11 w-11 items-center justify-center text-white/85 transition hover:text-white md:h-9 md:w-9"
+            aria-label="Cart"
+            onClick={openCart}
+          >
             <i className="ri-shopping-bag-line text-base" />
             {count > 0 && (
               <span className="absolute right-1 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-sage text-[10px] font-semibold text-white md:right-0 md:top-0">
                 {count}
               </span>
             )}
-          </Link>
+          </button>
           <button
             type="button"
             className="flex h-11 w-11 items-center justify-center text-white/85 transition hover:text-white md:hidden"
@@ -62,6 +74,8 @@ export function Header() {
           ))}
         </nav>
       )}
+
+      <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

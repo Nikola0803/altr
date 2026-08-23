@@ -14,13 +14,21 @@ export function ShopClient({ products }: { products: Product[] }) {
   useEffect(() => {
     const fromUrl = searchParams.get("category") as ProductCategory | null;
     if (fromUrl && categories.some((c) => c.value === fromUrl)) setActive(fromUrl);
+    const searchFromUrl = searchParams.get("search");
+    if (searchFromUrl) setQuery(searchFromUrl);
   }, [searchParams]);
 
   const filtered = useMemo(() => {
     let list = active === "all" ? products : products.filter((p) => p.category === active);
     if (query.trim()) {
       const q = query.trim().toLowerCase();
-      list = list.filter((p) => p.name.toLowerCase().includes(q));
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.categoryLabel.toLowerCase().includes(q) ||
+          p.shortDescription.toLowerCase().includes(q) ||
+          p.sku.toLowerCase().includes(q)
+      );
     }
     return list;
   }, [products, active, query]);
