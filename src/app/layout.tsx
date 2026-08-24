@@ -5,6 +5,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/layout/CartDrawer";
+import { AgeGate } from "@/components/layout/AgeGate";
 import { CartProvider } from "@/lib/cart-context";
 
 const spaceGrotesk = Space_Grotesk({
@@ -39,11 +40,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col bg-ivory text-charcoal">
         <CartProvider>
-          <AnnouncementBar />
-          <Header />
-          <main className="flex-1 pt-[90px] md:pt-[100px]">{children}</main>
-          <Footer />
-          <CartDrawer />
+          <AgeGate>
+            <AnnouncementBar />
+            <Header />
+            <main className="flex-1 pt-[90px] md:pt-[100px]">{children}</main>
+            <Footer />
+            <CartDrawer />
+          </AgeGate>
         </CartProvider>
       </body>
     </html>
