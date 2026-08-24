@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getAllProductCoas } from "@/lib/coa";
+import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
 
 const WHY_POINTS = [
   "HPLC purity analysis with quantification",
@@ -21,6 +22,7 @@ const PROTOCOL = [
 export function LabResultsClient() {
   const coas = useMemo(() => getAllProductCoas(), []);
   const [query, setQuery] = useState("");
+  const [viewing, setViewing] = useState<{ url: string; title: string } | null>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -131,14 +133,13 @@ export function LabResultsClient() {
                           <span className="font-mono text-[11px]">Batch {lab.batch}</span>
                         </div>
                         <div className="mt-3 flex gap-2">
-                          <a
-                            href={lab.pdfUrl}
-                            target="_blank"
-                            rel="noopener"
+                          <button
+                            type="button"
+                            onClick={() => setViewing({ url: lab.pdfUrl, title: `${coa.displayName} — ${lab.labName}` })}
                             className="flex-1 rounded-md bg-sage-deep py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-ivory transition hover:bg-charcoal"
                           >
                             View COA
-                          </a>
+                          </button>
                           <a
                             href={lab.pdfUrl}
                             download
@@ -200,6 +201,8 @@ export function LabResultsClient() {
           </div>
         </div>
       </section>
+
+      {viewing && <PdfViewerModal url={viewing.url} title={viewing.title} onClose={() => setViewing(null)} />}
     </>
   );
 }

@@ -8,6 +8,7 @@ import { ProductVisual } from "@/components/ui/ProductVisual";
 import { PackSelector, usePackSelection } from "@/components/product/PackSelector";
 import { useCart } from "@/lib/cart-context";
 import { getProductCoa } from "@/lib/coa";
+import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
 
 const TABS = ["Description", "Reviews", "Lab Report"] as const;
 
@@ -30,6 +31,7 @@ export function ProductClient({ product }: { product: Product }) {
   const { packIndex, setPackIndex, packs, selected } = usePackSelection(product);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<(typeof TABS)[number]>("Description");
+  const [viewing, setViewing] = useState<{ url: string; title: string } | null>(null);
   const { addToCart } = useCart();
 
   const lineTotal = selected.unitPrice * qty * selected.qty;
@@ -214,9 +216,13 @@ export function ProductClient({ product }: { product: Product }) {
                       <Row label="Status" value="PASS" accent />
                     </dl>
                     <div className="flex gap-2 border-t border-stone p-3">
-                      <a href={lab.pdfUrl} target="_blank" rel="noopener" className="flex-1 rounded-md bg-sage-deep py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-ivory transition hover:bg-charcoal">
+                      <button
+                        type="button"
+                        onClick={() => setViewing({ url: lab.pdfUrl, title: `${product.name} — ${lab.labName}` })}
+                        className="flex-1 rounded-md bg-sage-deep py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-ivory transition hover:bg-charcoal"
+                      >
                         View COA
-                      </a>
+                      </button>
                       <a href={lab.pdfUrl} download className="flex-1 rounded-md border border-stone py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-charcoal/70 transition hover:border-sage-deep hover:text-sage-deep">
                         Download
                       </a>
@@ -246,6 +252,8 @@ export function ProductClient({ product }: { product: Product }) {
           </div>
         </div>
       </div>
+
+      {viewing && <PdfViewerModal url={viewing.url} title={viewing.title} onClose={() => setViewing(null)} />}
     </section>
   );
 }

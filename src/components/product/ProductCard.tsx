@@ -7,6 +7,8 @@ import { Product } from "@/lib/types";
 import { ProductVisual } from "@/components/ui/ProductVisual";
 import { PackSelector, usePackSelection } from "./PackSelector";
 import { useCart } from "@/lib/cart-context";
+import { getProductCoa } from "@/lib/coa";
+import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
 
 const DOSAGE_PATTERN = /\s(\d+(?:\.\d+)?\s?(?:mg|mcg|iu|g)(?:\/\d+(?:\.\d+)?\s?(?:mg|mcg|iu|g))?)$/i;
 
@@ -21,7 +23,9 @@ export function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const { title, dosage } = splitDosage(product.name);
   const [hovering, setHovering] = useState(false);
+  const [viewing, setViewing] = useState<{ url: string; title: string } | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const coa = getProductCoa(product.slug);
 
   function handleEnter() {
     setHovering(true);
@@ -105,15 +109,27 @@ export function ProductCard({ product }: { product: Product }) {
             >
               {product.inStock ? "Add to Cart" : "Out of Stock"}
             </button>
-            <Link
-              href={`/lab-results?product=${product.slug}`}
-              className="flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.15em] text-charcoal/50 transition hover:text-charcoal"
-            >
-              View COA <i className="ri-arrow-right-up-line" />
-            </Link>
+            {coa ? (
+              <button
+                type="button"
+                onClick={() => setViewing({ url: coa.labs[0].pdfUrl, title: `${coa.displayName} — ${coa.labs[0].labName}` })}
+                className="flex w-full items-center justify-center gap-2 text-[11px] uppercase tracking-[0.15em] text-charcoal/50 transition hover:text-charcoal"
+              >
+                View COA <i className="ri-file-text-line" />
+              </button>
+            ) : (
+              <Link
+                href={`/lab-results?product=${product.slug}`}
+                className="flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.15em] text-charcoal/50 transition hover:text-charcoal"
+              >
+                View COA <i className="ri-arrow-right-up-line" />
+              </Link>
+            )}
           </div>
         </div>
       </div>
+
+      {viewing && <PdfViewerModal url={viewing.url} title={viewing.title} onClose={() => setViewing(null)} />}
     </div>
   );
 }
