@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Product } from "@/lib/types";
 import { ProductVisual } from "@/components/ui/ProductVisual";
 import { PackSelector, usePackSelection } from "@/components/product/PackSelector";
 import { useCart } from "@/lib/cart-context";
+import { getProductCoa } from "@/lib/coa";
 
 const TABS = ["Description", "Reviews", "Lab Report"] as const;
 
@@ -35,6 +37,7 @@ export function ProductClient({ product }: { product: Product }) {
   const shippingProgress = Math.min(100, (lineTotal / shippingThreshold) * 100);
   const shippingRemaining = Math.max(0, shippingThreshold - lineTotal);
   const { title, dosage } = splitDosage(product.name);
+  const coa = getProductCoa(product.slug);
 
   return (
     <section className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
@@ -191,7 +194,38 @@ export function ProductClient({ product }: { product: Product }) {
                 out of 5.
               </p>
             )}
-            {tab === "Lab Report" && product.batch && (
+            {tab === "Lab Report" && coa && (
+              <div className="max-w-xl space-y-4">
+                {coa.verifiedByTwoLabs && (
+                  <p className="flex items-center gap-1.5 text-sm font-medium text-sage-deep">
+                    <i className="ri-checkbox-circle-fill" /> Independently verified by two labs
+                  </p>
+                )}
+                {coa.labs.map((lab) => (
+                  <div key={lab.pdfUrl} className="overflow-hidden rounded-lg border border-stone">
+                    <div className="flex items-center justify-between bg-ivory-soft px-4 py-2.5">
+                      <span className="text-sm font-semibold text-charcoal">{lab.labName}</span>
+                      <span className="text-xs text-charcoal/50">{lab.scope}</span>
+                    </div>
+                    <dl className="divide-y divide-stone text-xs">
+                      <Row label="Batch" value={lab.batch} />
+                      <Row label="Tested" value={lab.testedLabel} />
+                      <Row label="Purity" value={lab.purity} accent />
+                      <Row label="Status" value="PASS" accent />
+                    </dl>
+                    <div className="flex gap-2 border-t border-stone p-3">
+                      <a href={lab.pdfUrl} target="_blank" rel="noopener" className="flex-1 rounded-md bg-sage-deep py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-ivory transition hover:bg-charcoal">
+                        View COA
+                      </a>
+                      <a href={lab.pdfUrl} download className="flex-1 rounded-md border border-stone py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-charcoal/70 transition hover:border-sage-deep hover:text-sage-deep">
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {tab === "Lab Report" && !coa && product.batch && (
               <div className="max-w-sm overflow-hidden rounded-lg border border-stone">
                 <dl className="divide-y divide-stone text-xs">
                   <Row label="Batch" value={product.batch.code} />
@@ -200,6 +234,13 @@ export function ProductClient({ product }: { product: Product }) {
                   {product.avgMass && <Row label="Avg. Mass" value={product.avgMass} />}
                   <Row label="Status" value="PASS" accent />
                 </dl>
+                <p className="border-t border-stone p-4 text-xs text-charcoal/50">
+                  Full batch documentation coming soon — see{" "}
+                  <Link href="/lab-results" className="font-medium text-sage-deep hover:underline">
+                    Lab Results
+                  </Link>{" "}
+                  for currently published reports.
+                </p>
               </div>
             )}
           </div>

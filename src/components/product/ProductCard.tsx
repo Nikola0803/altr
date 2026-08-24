@@ -106,7 +106,7 @@ export function ProductCard({ product }: { product: Product }) {
               {product.inStock ? "Add to Cart" : "Out of Stock"}
             </button>
             <Link
-              href="/lab-results"
+              href={`/lab-results?product=${product.slug}`}
               className="flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.15em] text-charcoal/50 transition hover:text-charcoal"
             >
               View COA <i className="ri-arrow-right-up-line" />

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Metadata } from "next";
 import { LabResultsClient } from "./LabResultsClient";
 
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function LabResultsPage() {
-  return <LabResultsClient />;
+  return (
+    <Suspense fallback={null}>
+      <LabResultsClient />
+    </Suspense>
+  );
 }
