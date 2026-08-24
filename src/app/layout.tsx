@@ -5,6 +5,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/layout/CartDrawer";
+import { QuizPopup } from "@/components/layout/QuizPopup";
 import { AgeGate } from "@/components/layout/AgeGate";
 import { CartProvider } from "@/lib/cart-context";
 
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <main className="flex-1 pt-[90px] md:pt-[100px]">{children}</main>
             <Footer />
             <CartDrawer />
+            <QuizPopup />
           </AgeGate>
         </CartProvider>
       </body>
