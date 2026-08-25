@@ -9,8 +9,17 @@ const SHOP_NAV = [
   { href: "/contact", label: "Contact" },
 ];
 
-const CUSTOMER_NAV = ["Account", "Orders", "Shipping", "Returns"];
-const LEGAL_NAV = ["Research Use Only", "Terms", "Privacy"];
+const CUSTOMER_NAV: { label: string; href?: string }[] = [
+  { label: "Account" },
+  { label: "Orders" },
+  { label: "Shipping", href: "/legal/shipping" },
+  { label: "Returns" },
+];
+const LEGAL_NAV: { label: string; href?: string }[] = [
+  { label: "Research Use Only" },
+  { label: "Terms", href: "/legal/terms" },
+  { label: "Privacy", href: "/legal/privacy" },
+];
 
 export function Footer() {
   return (
@@ -31,17 +40,29 @@ export function Footer() {
           </FooterColumn>
 
           <FooterColumn title="Customer">
-            {CUSTOMER_NAV.map((label) => (
-              <li key={label} className="text-sm text-white/40">
-                {label}
+            {CUSTOMER_NAV.map((item) => (
+              <li key={item.label}>
+                {item.href ? (
+                  <Link href={item.href} className="text-sm text-white/60 transition hover:text-white">
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span className="text-sm text-white/40">{item.label}</span>
+                )}
               </li>
             ))}
           </FooterColumn>
 
           <FooterColumn title="Legal">
-            {LEGAL_NAV.map((label) => (
-              <li key={label} className="text-sm text-white/40">
-                {label}
+            {LEGAL_NAV.map((item) => (
+              <li key={item.label}>
+                {item.href ? (
+                  <Link href={item.href} className="text-sm text-white/60 transition hover:text-white">
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span className="text-sm text-white/40">{item.label}</span>
+                )}
               </li>
             ))}
           </FooterColumn>

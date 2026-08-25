@@ -174,7 +174,7 @@ export function AgeGate({ children }: { children: React.ReactNode }) {
                   />
                   <span className="text-[12px] font-medium leading-snug text-charcoal/80">
                     I confirm I am {MIN_AGE} or older and agree to the{" "}
-                    <a href="/faq" className="text-sage-deep hover:underline">
+                    <a href="/legal/terms" className="text-sage-deep hover:underline">
                       research-only terms
                     </a>
                     .
