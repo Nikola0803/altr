@@ -282,6 +282,15 @@ export const QUIZ_PRODUCTS: Record<string, QuizProduct> = {
   },
 };
 
+/** Which research-goal slugs a product shows up under (derived from its variant keys), for category filtering elsewhere (e.g. Lab Results). */
+export function getProductGoalSlugs(productSlug: string): string[] {
+  const product = QUIZ_PRODUCTS[productSlug];
+  if (!product) return [];
+  const goals = new Set<string>();
+  Object.keys(product.variants).forEach((key) => goals.add(key.split(":")[0]));
+  return Array.from(goals);
+}
+
 export const QUIZ_LABELS = {
   startHere: "Start here",
   alsoWorthLook: "Also worth a look",

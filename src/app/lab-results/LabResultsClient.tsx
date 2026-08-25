@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getAllProductCoas } from "@/lib/coa";
+import { QUIZ_GOALS, getProductGoalSlugs } from "@/lib/quiz-content";
 import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
 
 const WHY_POINTS = [
@@ -22,6 +23,7 @@ const PROTOCOL = [
 export function LabResultsClient() {
   const coas = useMemo(() => getAllProductCoas(), []);
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("all");
   const [viewing, setViewing] = useState<{ url: string; title: string } | null>(null);
   const searchParams = useSearchParams();
 
@@ -33,10 +35,11 @@ export function LabResultsClient() {
   }, [searchParams, coas]);
 
   const totalReports = coas.reduce((sum, c) => sum + c.labs.length, 0);
-  const avgPurity =
-    coas.reduce((sum, c) => sum + parseFloat(c.topPurity), 0) / coas.length;
+  const avgPurity = coas.reduce((sum, c) => sum + parseFloat(c.topPurity), 0) / coas.length;
+  const sample = coas[0];
 
   const filtered = coas.filter((c) => {
+    if (category !== "all" && !getProductGoalSlugs(c.slug).includes(category)) return false;
     const q = query.trim().toLowerCase();
     if (!q) return true;
     return (
@@ -47,117 +50,173 @@ export function LabResultsClient() {
   });
 
   const STATS: [string, string][] = [
-    [String(coas.length), "Products Verified"],
+    [String(coas.length), "Compounds on File"],
     [`${totalReports}+`, "Lab Reports"],
     [`${avgPurity.toFixed(1)}%`, "Avg. Purity"],
-    ["0", "Failed Batches"],
+    ["US / CA", "Independent Labs"],
   ];
 
   return (
     <>
-      <section className="bg-sage-deep py-20 text-center text-white md:py-32">
+      {/* Hero */}
+      <section className="bg-sage-deep py-16 text-white md:py-24">
         <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-sage-light">
-            <i className="ri-shield-check-line" /> Independent Verification
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_380px] lg:gap-16">
+            <div>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-sage-light">
+                <i className="ri-shield-check-line" /> Third-Party Verified
+              </div>
+              <h1 className="font-display text-4xl font-bold leading-[1.02] md:text-5xl lg:text-6xl">
+                Every batch, documented.
+                <br />
+                Nothing left to trust blindly.
+              </h1>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/70 md:text-lg">
+                Each compound is independently tested by third-party labs in Canada and the US using HPLC-UV,
+                with the certificate published here before it ever ships.
+              </p>
+
+              <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
+                {STATS.map(([value, label]) => (
+                  <div key={label}>
+                    <div className="font-display text-2xl font-bold md:text-3xl">{value}</div>
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-white/50">{label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {sample && (
+              <div className="rounded-xl border border-white/15 bg-charcoal/40 p-5 backdrop-blur-sm">
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">Sample Record</p>
+                  <span className="flex items-center gap-1 rounded-full bg-sage-light/20 px-2 py-0.5 text-[10px] font-semibold text-sage-light">
+                    <i className="ri-checkbox-circle-fill" /> Verified
+                  </span>
+                </div>
+                <p className="mt-3 font-display text-lg font-bold">{sample.displayName}</p>
+                <p className="text-xs text-white/50">{sample.composition}</p>
+                <div className="mt-4 grid grid-cols-2 gap-4 border-t border-white/10 pt-4 text-xs">
+                  <div>
+                    <p className="text-white/40">Purity</p>
+                    <p className="mt-0.5 font-semibold text-sage-light">{sample.labs[0].purity}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/40">Method</p>
+                    <p className="mt-0.5 font-semibold">{sample.topMethod}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/40">Batch</p>
+                    <p className="mt-0.5 font-mono font-semibold">{sample.labs[0].batch}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/40">Tested</p>
+                    <p className="mt-0.5 font-semibold">{sample.labs[0].testedLabel}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <h1 className="mb-4 font-display text-4xl font-bold md:text-5xl lg:text-6xl">Lab Results</h1>
-          <p className="mx-auto max-w-2xl text-base leading-relaxed text-white/70 md:text-lg">
-            Every batch is independently tested. View purity, method and batch verification for complete
-            transparency.
+        </div>
+      </section>
+
+      {/* Filters */}
+      <section className="sticky top-[90px] z-30 border-b border-stone bg-ivory/95 backdrop-blur-sm md:top-[100px]">
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
+          <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0">
+            <button
+              type="button"
+              onClick={() => setCategory("all")}
+              className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs font-medium transition ${
+                category === "all" ? "bg-sage text-white" : "border border-stone bg-ivory-soft text-charcoal/70 hover:bg-stone/40"
+              }`}
+            >
+              All Compounds
+            </button>
+            {QUIZ_GOALS.map((g) => (
+              <button
+                key={g.slug}
+                type="button"
+                onClick={() => setCategory(g.slug)}
+                className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs font-medium transition ${
+                  category === g.slug ? "bg-sage text-white" : "border border-stone bg-ivory-soft text-charcoal/70 hover:bg-stone/40"
+                }`}
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="relative w-full sm:w-64">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search compound or batch #"
+              className="w-full rounded-md border border-stone bg-ivory-soft py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-sage-deep"
+            />
+            <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/40" />
+          </div>
+        </div>
+      </section>
+
+      {/* List */}
+      <section className="py-10 md:py-14">
+        <div className="mx-auto max-w-[1400px] px-4 md:px-8">
+          <p className="mb-4 text-xs text-charcoal/40">
+            {filtered.length} of {coas.length} compounds
           </p>
-        </div>
-      </section>
-
-      <section className="border-b border-stone py-14">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-6 px-4 md:grid-cols-4 md:px-8">
-          {STATS.map(([value, label]) => (
-            <div key={label} className="p-4 text-center">
-              <div className="font-display text-3xl font-bold text-sage-deep md:text-4xl">{value}</div>
-              <div className="mt-1 text-sm text-charcoal/50">{label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24">
-        <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-            <h2 className="font-display text-xl font-bold text-charcoal md:text-2xl">Certificates of Analysis</h2>
-            <div className="relative w-full sm:w-72">
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search product, batch or lab..."
-                className="w-full rounded-md border border-stone bg-ivory-soft py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-sage-deep"
-              />
-              <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/40" />
-            </div>
-          </div>
 
           {filtered.length === 0 ? (
             <p className="py-12 text-center text-sm text-charcoal/50">No results found.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="divide-y divide-stone rounded-lg border border-stone">
               {filtered.map((coa) => (
-                <article key={coa.slug} className="rounded-lg border border-stone bg-ivory-soft p-5 md:p-6">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="font-display text-lg font-bold text-charcoal">{coa.displayName}</h3>
-                      <p className="mt-0.5 text-xs text-charcoal/50">{coa.composition}</p>
-                    </div>
-                    <div className="flex shrink-0 flex-col items-end gap-0.5 rounded-md bg-sage-mist px-3 py-1.5 text-right">
-                      <span className="font-display text-sm font-bold text-sage-deep">{coa.topPurity}</span>
-                      <span className="text-[9px] uppercase tracking-wide text-sage-deep/70">{coa.topMethod}</span>
+                <div key={coa.slug} className="flex flex-col gap-3 p-4 transition hover:bg-ivory-soft sm:flex-row sm:items-center sm:gap-6 md:p-5">
+                  <div className="flex shrink-0 items-center gap-3 sm:w-56">
+                    <span className="shrink-0 rounded-md bg-sage-mist px-2.5 py-1.5 text-center font-display text-sm font-bold text-sage-deep">
+                      {coa.topPurity}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate font-display text-sm font-bold text-charcoal">{coa.displayName}</p>
+                      <p className="truncate text-xs text-charcoal/50">{coa.composition}</p>
                     </div>
                   </div>
 
-                  {coa.verifiedByTwoLabs && (
-                    <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-sage-deep">
-                      <i className="ri-checkbox-circle-fill" /> Independently verified by two labs
-                    </p>
-                  )}
-
-                  <div className="mt-4 space-y-3 border-t border-stone pt-4">
+                  <div className="flex-1 space-y-1.5">
                     {coa.labs.map((lab) => (
-                      <div key={lab.pdfUrl} className="rounded-md border border-stone bg-ivory p-3.5">
-                        <div className="flex flex-wrap items-center justify-between gap-1">
-                          <span className="text-sm font-semibold text-charcoal">{lab.labName}</span>
-                          <span className="text-xs text-charcoal/50">{lab.scope}</span>
-                        </div>
-                        <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-charcoal/60">
-                          <span>
-                            <strong className="font-semibold text-charcoal">Purity</strong> {lab.purity}
-                          </span>
-                          <span>Tested {lab.testedLabel}</span>
-                          <span className="font-mono text-[11px]">Batch {lab.batch}</span>
-                        </div>
-                        <div className="mt-3 flex gap-2">
+                      <div key={lab.pdfUrl} className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-charcoal/60">
+                        <span className="w-32 shrink-0 truncate font-medium text-charcoal/80">{lab.labName}</span>
+                        <span className="font-mono">Batch {lab.batch}</span>
+                        <span>Tested {lab.testedLabel}</span>
+                        <span className="font-semibold text-sage-deep">{lab.purity}</span>
+                        <div className="ml-auto flex gap-2">
                           <button
                             type="button"
                             onClick={() => setViewing({ url: lab.pdfUrl, title: `${coa.displayName} — ${lab.labName}` })}
-                            className="flex-1 rounded-md bg-sage-deep py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-ivory transition hover:bg-charcoal"
+                            className="rounded-full bg-sage-deep px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-ivory transition hover:bg-charcoal"
                           >
                             View COA
                           </button>
                           <a
                             href={lab.pdfUrl}
                             download
-                            className="flex-1 rounded-md border border-stone py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-charcoal/70 transition hover:border-sage-deep hover:text-sage-deep"
+                            className="rounded-full border border-stone px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-charcoal/70 transition hover:border-sage-deep hover:text-sage-deep"
                           >
-                            Download
+                            PDF
                           </a>
                         </div>
                       </div>
                     ))}
                   </div>
-                </article>
+                </div>
               ))}
             </div>
           )}
         </div>
       </section>
 
+      {/* Why independent testing */}
       <section className="bg-sage-forest py-20 text-white md:py-32">
         <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-center gap-10 px-4 md:grid-cols-2 md:px-8">
           <div>
