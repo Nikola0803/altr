@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <TrustIconRow items={HOME_TRUST_ITEMS} />
+      <TrustIconRow items={HOME_TRUST_ITEMS} marquee />
       <FeaturedProducts />
       <ShopByCategory />
       <AboutSection />

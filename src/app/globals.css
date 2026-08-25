@@ -164,6 +164,15 @@ body {
   min-height: 92dvh;
 }
 
+@keyframes trust-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.trust-marquee {
+  animation: trust-marquee 24s linear infinite !important;
+}
+
 .container-altr {
   max-width: 1360px;
   margin-left: auto;
