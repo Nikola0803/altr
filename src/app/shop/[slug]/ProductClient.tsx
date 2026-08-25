@@ -9,6 +9,7 @@ import { PackSelector, usePackSelection } from "@/components/product/PackSelecto
 import { useCart } from "@/lib/cart-context";
 import { getProductCoa } from "@/lib/coa";
 import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
+import { getCartUpsellProducts } from "@/lib/upsells";
 
 const TABS = ["Description", "Reviews", "Lab Report"] as const;
 
@@ -40,10 +41,11 @@ export function ProductClient({ product }: { product: Product }) {
   const shippingRemaining = Math.max(0, shippingThreshold - lineTotal);
   const { title, dosage } = splitDosage(product.name);
   const coa = getProductCoa(product.slug);
+  const upsells = getCartUpsellProducts([product.id]);
 
   return (
-    <section className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
-      <div className="relative">
+    <section className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start lg:gap-12">
+      <div className="relative lg:sticky lg:top-[120px]">
         <div className="overflow-hidden rounded-lg border border-stone bg-ivory-soft">
           <div className="aspect-square w-full">
             {product.image ? (
@@ -161,6 +163,29 @@ export function ProductClient({ product }: { product: Product }) {
           </div>
           <p className="mt-2 text-xs text-charcoal/50">Free express shipping on all orders over $400 CAD</p>
         </div>
+
+        {upsells.length > 0 && (
+          <div className="mt-6 rounded-lg border border-stone bg-ivory-soft p-4">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-charcoal/50">
+              Frequently Added Together
+            </p>
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {upsells.map((up) => (
+                <Link
+                  key={up.id}
+                  href={`/shop/${up.slug}`}
+                  className="flex w-32 shrink-0 flex-col gap-2 rounded-md border border-stone bg-ivory p-2.5 transition hover:border-sage-deep"
+                >
+                  <div className="aspect-square w-full overflow-hidden rounded bg-ivory-soft">
+                    {up.image && <Image src={up.image} alt={up.name} width={128} height={128} className="h-full w-full object-cover" />}
+                  </div>
+                  <p className="line-clamp-2 text-[11px] font-medium leading-snug text-charcoal">{up.name}</p>
+                  <p className="text-xs font-semibold text-charcoal">${up.price.toFixed(2)}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-10 border-t border-stone">
           <div className="flex items-center gap-0 border-b border-stone">

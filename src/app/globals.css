@@ -43,7 +43,6 @@ body {
   background: var(--color-ivory);
   color: var(--color-charcoal);
   font-family: var(--font-body), Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
 }
 
 ::selection {

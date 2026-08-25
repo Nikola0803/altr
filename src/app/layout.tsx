@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/layout/CartDrawer";
 import { QuizPopup } from "@/components/layout/QuizPopup";
+import { PopupManager } from "@/components/layout/PopupManager";
 import { AgeGate } from "@/components/layout/AgeGate";
 import { CartProvider } from "@/lib/cart-context";
 
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Footer />
             <CartDrawer />
             <QuizPopup />
+            <PopupManager />
           </AgeGate>
         </CartProvider>
       </body>
