@@ -78,7 +78,10 @@ export function ProductCard({ product }: { product: Product }) {
           </video>
         </div>
         {product.badges?.map((badge) => (
-          <span key={badge} className="absolute left-3 top-3 text-[10px] font-semibold uppercase tracking-wider text-sage-deep">
+          <span
+            key={badge}
+            className="absolute left-3 top-3 rounded-full bg-ivory px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-sage-deep shadow-sm"
+          >
             {badge}
           </span>
         ))}
