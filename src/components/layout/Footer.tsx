@@ -13,7 +13,7 @@ const CUSTOMER_NAV: { label: string; href?: string }[] = [
   { label: "Account" },
   { label: "Orders" },
   { label: "Shipping", href: "/legal/shipping" },
-  { label: "Returns" },
+  { label: "Returns", href: "/legal/returns" },
 ];
 const LEGAL_NAV: { label: string; href?: string }[] = [
   { label: "Research Use Only" },
