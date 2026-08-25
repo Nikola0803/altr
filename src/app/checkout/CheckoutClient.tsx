@@ -4,17 +4,33 @@ import { FormEvent, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/cart-context";
+import { getCartUpsellProducts } from "@/lib/upsells";
 
 const SHIPPING_THRESHOLD = 400;
 const FLAT_SHIPPING = 15;
+const FEATURED_DISCOUNT = 25;
+const SECONDARY_DISCOUNT = 10;
 
 export function CheckoutClient() {
-  const { lines, subtotal } = useCart();
+  const { lines, subtotal, addToCart } = useCart();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [addedIds, setAddedIds] = useState<string[]>([]);
 
   const shipping = subtotal >= SHIPPING_THRESHOLD || lines.length === 0 ? 0 : FLAT_SHIPPING;
   const total = subtotal + shipping;
+  const shippingRemaining = Math.max(0, SHIPPING_THRESHOLD - subtotal);
+  const shippingProgress = Math.min(100, (subtotal / SHIPPING_THRESHOLD) * 100);
+
+  const cartProductIds = lines.map((l) => l.product.id);
+  const upsells = getCartUpsellProducts(cartProductIds, 4);
+  const [featured, ...secondary] = upsells;
+
+  function quickAdd(product: (typeof upsells)[number], discountPercent: number) {
+    const salePrice = product.price * (1 - discountPercent / 100);
+    addToCart(product, 1, salePrice, `${discountPercent}% Off`, { silent: true });
+    setAddedIds((ids) => [...ids, product.id]);
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -131,6 +147,18 @@ export function CheckoutClient() {
         </form>
 
         <div className="h-fit rounded-lg border border-stone bg-ivory-soft p-6">
+          {shippingRemaining > 0 && (
+            <div className="mb-5">
+              <p className="mb-2 text-xs font-medium text-charcoal/60">
+                Spend <span className="font-semibold text-sage-deep">${shippingRemaining.toFixed(2)}</span> more for
+                free shipping
+              </p>
+              <div className="h-1.5 overflow-hidden rounded-full bg-stone">
+                <div className="h-full rounded-full bg-sage transition-all duration-500" style={{ width: `${shippingProgress}%` }} />
+              </div>
+            </div>
+          )}
+
           <h2 className="mb-5 text-sm font-semibold uppercase tracking-wide text-charcoal/70">Order Summary</h2>
           <ul className="space-y-4">
             {lines.map((line) => (
@@ -150,6 +178,35 @@ export function CheckoutClient() {
             ))}
           </ul>
 
+          {featured && !addedIds.includes(featured.id) && (
+            <div className="mt-6 rounded-lg border border-sage-deep/30 bg-sage-mist/40 p-4">
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-sage-deep">
+                Add {featured.name.split(/\s\d/)[0]} — {FEATURED_DISCOUNT}% off today only
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-ivory">
+                  {featured.image && <Image src={featured.image} alt={featured.name} width={112} height={112} className="h-full w-full object-cover" />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-charcoal">{featured.name}</p>
+                  <p className="text-xs">
+                    <span className="text-charcoal/40 line-through">${featured.price.toFixed(2)}</span>{" "}
+                    <span className="font-semibold text-sage-deep">
+                      ${(featured.price * (1 - FEATURED_DISCOUNT / 100)).toFixed(2)}
+                    </span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => quickAdd(featured, FEATURED_DISCOUNT)}
+                  className="shrink-0 rounded-md bg-sage-deep px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-ivory transition hover:bg-charcoal"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="mt-6 space-y-2 border-t border-stone pt-4 text-sm">
             <div className="flex justify-between text-charcoal/60">
               <span>Subtotal</span>
@@ -164,6 +221,40 @@ export function CheckoutClient() {
               <span>${total.toFixed(2)} CAD</span>
             </div>
           </div>
+
+          {secondary.length > 0 && (
+            <div className="mt-6 border-t border-stone pt-5">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-charcoal/50">Researchers Also Add</p>
+              <div className="space-y-2.5">
+                {secondary.map((up) => {
+                  const added = addedIds.includes(up.id);
+                  const salePrice = up.price * (1 - SECONDARY_DISCOUNT / 100);
+                  return (
+                    <div key={up.id} className="flex items-center gap-3 rounded-md border border-stone bg-ivory p-2.5">
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-ivory-soft">
+                        {up.image && <Image src={up.image} alt={up.name} width={80} height={80} className="h-full w-full object-cover" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs font-medium text-charcoal">{up.name}</p>
+                        <p className="text-xs">
+                          <span className="text-charcoal/40 line-through">${up.price.toFixed(2)}</span>{" "}
+                          <span className="font-semibold text-sage-deep">${salePrice.toFixed(2)}</span>
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        disabled={added}
+                        onClick={() => quickAdd(up, SECONDARY_DISCOUNT)}
+                        className="shrink-0 rounded-full bg-sage-mist px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-sage-deep transition hover:bg-sage-deep hover:text-ivory disabled:cursor-default disabled:opacity-50"
+                      >
+                        {added ? "Added" : `Add — ${SECONDARY_DISCOUNT}% off`}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
