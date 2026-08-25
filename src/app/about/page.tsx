@@ -9,6 +9,15 @@ export const metadata: Metadata = {
   description: "Why ALTR exists, how we test, and the standard every batch is held to before it's ever listed.",
 };
 
+const VALUES = [
+  { title: "Documentation over claims.", body: "Anyone can say “high purity.” We’d rather hand you the chromatogram." },
+  { title: "Plain pricing over discount theater.", body: "No code to hunt for, no countdown resetting on refresh. The price on the page is the price." },
+  { title: "Research-first, not consumer-health.", body: "Written for people who already know what a COA is and want to find theirs fast." },
+  { title: "Cold-chain, every shipment.", body: "Temperature-controlled from dispatch to delivery, not just from the lab to our door." },
+  { title: "No affiliates, no funded reviews.", body: "Nobody earns a commission for pointing you at a compound." },
+  { title: "Batch traceability, indefinitely.", body: "Every report stays published, tied to its lot number, for as long as we sell the product." },
+];
+
 const STANDARDS = [
   {
     num: "01",
@@ -104,6 +113,25 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* What we stand for */}
+      <section className="bg-ivory-soft py-20 md:py-32">
+        <div className="mx-auto max-w-[1400px] px-4 md:px-8">
+          <p className="mb-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-sage-deep">What We Stand For</p>
+          <h2 className="mx-auto max-w-xl text-center font-display text-3xl font-bold text-charcoal md:text-4xl">
+            The short version of how we operate.
+          </h2>
+
+          <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {VALUES.map((v) => (
+              <div key={v.title} className="rounded-lg border border-stone bg-ivory p-6">
+                <h3 className="font-display text-base font-bold leading-snug text-charcoal">{v.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-charcoal/60">{v.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Stats */}
       <section className="border-y border-stone bg-sage-deep py-14">
         <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-y-10 px-4 md:grid-cols-4 md:px-8">
@@ -140,6 +168,24 @@ export default function AboutPage() {
                 <p className="mt-2 text-sm leading-relaxed text-charcoal/60">{item.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What ALTR is not */}
+      <section className="bg-ivory-soft py-20 md:py-32">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-center gap-14 px-4 md:px-8 lg:grid-cols-2 lg:gap-20">
+          <div>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-sage-deep">Being clear</p>
+            <h2 className="font-display text-3xl font-bold leading-tight text-charcoal md:text-4xl">What ALTR is not.</h2>
+            <p className="mt-6 max-w-lg text-base leading-relaxed text-soft-gray md:text-lg">
+              ALTR is a research-use-only supplier. Our products are sold strictly for laboratory and research
+              purposes — not for human consumption, not for medical use, and not as a treatment for any
+              condition. We don&apos;t make therapeutic claims, and we never will.
+            </p>
+          </div>
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-lg lg:order-2">
+            <Image src="/images/hero-vial.jpg" alt="ALTR research vial" width={900} height={675} className="h-full w-full object-cover" />
           </div>
         </div>
       </section>
