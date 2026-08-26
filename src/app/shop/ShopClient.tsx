@@ -2,24 +2,45 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Product, ProductCategory } from "@/lib/types";
-import { categories } from "@/lib/products";
+import { Product } from "@/lib/types";
 import { ProductCard } from "@/components/product/ProductCard";
+import { QUIZ_GOALS, getProductGoalSlugs } from "@/lib/quiz-content";
+
+const BLEND_SLUGS = ["wolverine-stack-20mg", "glow-70mg", "klow-80mg", "cjc-1295-without-dac-ipamorelin-10mg"];
+
+type Format = "single" | "blend" | "ancillary";
+
+function getFormat(p: Product): Format {
+  if (p.category === "ancillaries") return "ancillary";
+  if (BLEND_SLUGS.includes(p.slug)) return "blend";
+  return "single";
+}
+
+const FORMATS: { value: Format; label: string }[] = [
+  { value: "single", label: "Single Vial" },
+  { value: "blend", label: "Blend" },
+  { value: "ancillary", label: "Ancillary" },
+];
 
 export function ShopClient({ products }: { products: Product[] }) {
   const searchParams = useSearchParams();
-  const [active, setActive] = useState<ProductCategory | "all">("all");
   const [query, setQuery] = useState("");
+  const [goal, setGoal] = useState<string | null>(null);
+  const [format, setFormat] = useState<Format | null>(null);
+  const [sortAZ, setSortAZ] = useState(false);
+  const [openPanel, setOpenPanel] = useState<"category" | "format" | null>(null);
 
   useEffect(() => {
-    const fromUrl = searchParams.get("category") as ProductCategory | null;
-    if (fromUrl && categories.some((c) => c.value === fromUrl)) setActive(fromUrl);
     const searchFromUrl = searchParams.get("search");
     if (searchFromUrl) setQuery(searchFromUrl);
+    const categoryFromUrl = searchParams.get("category");
+    if (categoryFromUrl === "ancillaries") setFormat("ancillary");
   }, [searchParams]);
 
   const filtered = useMemo(() => {
-    let list = active === "all" ? products : products.filter((p) => p.category === active);
+    let list = products;
+    if (goal) list = list.filter((p) => getProductGoalSlugs(p.slug).includes(goal));
+    if (format) list = list.filter((p) => getFormat(p) === format);
     if (query.trim()) {
       const q = query.trim().toLowerCase();
       list = list.filter(
@@ -30,8 +51,19 @@ export function ShopClient({ products }: { products: Product[] }) {
           p.sku.toLowerCase().includes(q)
       );
     }
+    if (sortAZ) list = [...list].sort((a, b) => a.name.localeCompare(b.name));
     return list;
-  }, [products, active, query]);
+  }, [products, goal, format, query, sortAZ]);
+
+  function resetAll() {
+    setGoal(null);
+    setFormat(null);
+    setSortAZ(false);
+    setOpenPanel(null);
+  }
+
+  const goalLabel = goal ? QUIZ_GOALS.find((g) => g.slug === goal)?.label : null;
+  const formatLabel = format ? FORMATS.find((f) => f.value === format)?.label : null;
 
   return (
     <>
@@ -57,22 +89,105 @@ export function ShopClient({ products }: { products: Product[] }) {
 
       <section className="sticky top-[90px] z-40 border-b border-stone bg-ivory/95 backdrop-blur-sm md:top-[100px]">
         <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <div className="flex items-center gap-2 overflow-x-auto py-4 md:gap-3">
-            {categories.map((c) => {
-              const count = c.value === "all" ? products.length : products.filter((p) => p.category === c.value).length;
-              return (
-                <button
-                  key={c.value}
-                  type="button"
-                  onClick={() => setActive(c.value)}
-                  className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition md:px-5 ${
-                    active === c.value ? "bg-sage text-white" : "border border-stone bg-ivory-soft text-charcoal/70 hover:bg-stone/40"
-                  }`}
-                >
-                  {c.label} <span className="ml-0.5 text-[10px] opacity-60">({count})</span>
-                </button>
-              );
-            })}
+          <div className="relative flex items-center gap-2 overflow-x-auto py-4 md:gap-3">
+            <button
+              type="button"
+              onClick={resetAll}
+              className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition md:px-5 ${
+                !goal && !format && !sortAZ ? "bg-sage text-white" : "border border-stone bg-ivory-soft text-charcoal/70 hover:bg-stone/40"
+              }`}
+            >
+              All
+            </button>
+
+            {/* Shop by Category */}
+            <div className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => setOpenPanel((p) => (p === "category" ? null : "category"))}
+                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition md:px-5 ${
+                  goal ? "bg-sage text-white" : "border border-stone bg-ivory-soft text-charcoal/70 hover:bg-stone/40"
+                }`}
+              >
+                {goalLabel ?? "Shop by Category"}
+                <i className={`ri-arrow-down-s-line transition-transform ${openPanel === "category" ? "rotate-180" : ""}`} />
+              </button>
+              {openPanel === "category" && (
+                <div className="absolute left-0 top-full z-50 mt-2 w-64 rounded-lg border border-stone bg-ivory p-2 shadow-xl">
+                  {QUIZ_GOALS.map((g) => (
+                    <button
+                      key={g.slug}
+                      type="button"
+                      onClick={() => {
+                        setGoal(g.slug);
+                        setOpenPanel(null);
+                      }}
+                      className={`block w-full rounded-md px-3 py-2 text-left text-sm transition ${
+                        goal === g.slug ? "bg-sage-mist text-sage-deep font-semibold" : "text-charcoal/70 hover:bg-ivory-soft"
+                      }`}
+                    >
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Shop by Format */}
+            <div className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => setOpenPanel((p) => (p === "format" ? null : "format"))}
+                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition md:px-5 ${
+                  format ? "bg-sage text-white" : "border border-stone bg-ivory-soft text-charcoal/70 hover:bg-stone/40"
+                }`}
+              >
+                {formatLabel ?? "Shop by Format"}
+                <i className={`ri-arrow-down-s-line transition-transform ${openPanel === "format" ? "rotate-180" : ""}`} />
+              </button>
+              {openPanel === "format" && (
+                <div className="absolute left-0 top-full z-50 mt-2 w-48 rounded-lg border border-stone bg-ivory p-2 shadow-xl">
+                  {FORMATS.map((f) => (
+                    <button
+                      key={f.value}
+                      type="button"
+                      onClick={() => {
+                        setFormat(f.value);
+                        setOpenPanel(null);
+                      }}
+                      className={`block w-full rounded-md px-3 py-2 text-left text-sm transition ${
+                        format === f.value ? "bg-sage-mist text-sage-deep font-semibold" : "text-charcoal/70 hover:bg-ivory-soft"
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setSortAZ((v) => !v)}
+              className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition md:px-5 ${
+                sortAZ ? "bg-sage text-white" : "border border-stone bg-ivory-soft text-charcoal/70 hover:bg-stone/40"
+              }`}
+            >
+              A–Z
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setFormat("blend");
+                setOpenPanel(null);
+              }}
+              className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition md:px-5 ${
+                format === "blend" ? "bg-sage text-white" : "border border-stone bg-ivory-soft text-charcoal/70 hover:bg-stone/40"
+              }`}
+            >
+              Bundles
+            </button>
           </div>
         </div>
       </section>
