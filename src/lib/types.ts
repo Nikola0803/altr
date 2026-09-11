@@ -45,3 +45,14 @@ export interface FaqItem {
   question: string;
   answer: string;
 }
+
+export interface Bundle {
+  slug: string;
+  name: string;
+  tagline: string;
+  category: string;
+  duration: string;
+  price: number;
+  compareAtPrice: number;
+  comingSoon?: boolean;
+}

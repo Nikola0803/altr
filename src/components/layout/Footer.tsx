@@ -16,7 +16,9 @@ const CUSTOMER_NAV: { label: string; href?: string }[] = [
   { label: "Returns", href: "/legal/returns" },
 ];
 const LEGAL_NAV: { label: string; href?: string }[] = [
-  { label: "Research Use Only" },
+  { label: "Research Use Only", href: "/legal/ruo" },
+  { label: "Sourcing & Quality", href: "/legal/sourcing" },
+  { label: "Indemnity Waiver", href: "/legal/indemnity-waiver" },
   { label: "Terms", href: "/legal/terms" },
   { label: "Privacy", href: "/legal/privacy" },
 ];

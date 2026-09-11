@@ -180,6 +180,35 @@ reimbursement clause was dropped since this checkout doesn't accept crypto. If t
 differ from what's live, treat these as a first draft, not final legal copy — they haven't been reviewed by a
 lawyer.
 
+Also live: `/legal/ruo` (Research Use Only policy — what support can/can't discuss), `/legal/sourcing`
+(supplier-confidentiality + quality-verification policy), `/legal/indemnity-waiver` (Indemnity, Liability Waiver
+& Assumption of Risk agreement). Ported over from a sibling project (EVLV, a brand fork of this codebase) and
+re-skinned to ALTR's own design tokens — same "first draft, not lawyer-reviewed" caveat applies. All three are
+linked from the footer's Legal column and cross-link each other.
+
+## Bundles
+
+`/bundles` — pre-built multi-compound research protocols (`src/lib/bundles.ts`, `BundleCard`), sold as synthetic
+cart line items via the normal `useCart().addToCart()` path (not real per-item bundle contents yet — a bundle is
+one cart line at a flat price). Prices/compareAtPrice are placeholder mock data, same convention as the rest of
+the catalog. Linked from the Shop mega menu's "Bundles →" link.
+
+## Analytics & reviews (optional, off until configured)
+
+Ported from EVLV, both self-contained (no CRM/backend dependency) and both render nothing until their env vars
+are set in `.env.local` (gitignored):
+- **GA4** (`src/components/layout/GoogleAnalytics.tsx`) — set `NEXT_PUBLIC_GA_MEASUREMENT_ID` (a `G-XXXXXXXXXX`
+  from Google Analytics > Admin > Data Streams).
+- **GTM** (`src/components/layout/GoogleTagManager.tsx`) — set `NEXT_PUBLIC_GTM_ID` (a `GTM-XXXXXXX` container
+  ID).
+- **Google Places reviews** (`src/lib/google-reviews.ts`, `src/components/home/ReviewsSection.tsx`) — set
+  `GOOGLE_PLACES_API_KEY` (server-only, restricted to the Places API) and `GOOGLE_PLACE_ID` (ALTR's Google
+  Business Profile place ID). Once both are set, the homepage automatically swaps the mock `Testimonials`
+  carousel for this live component (`src/app/page.tsx`); until then the mock carousel keeps showing so
+  production never shows an empty "not connected" box. `DEMO_REVIEWS=true` (or Vercel Preview deploys
+  automatically) shows placeholder review content from `src/lib/demo-reviews.ts` for internal design review only
+  — never set it in Production.
+
 ## Known gaps / explicitly not built
 
 - **No real checkout** — see WooCommerce status above, this is the big one.
@@ -187,7 +216,8 @@ lawyer.
 - **CMS plugin not connected** — frontend still reads mock data from `src/lib/`.
 - Contact form and newsletter form are UI-only — `// TODO` marks where to wire a real email provider.
 - 35 of 60 products don't have real COAs yet (see catalog rules above).
-- Homepage stats and testimonials are illustrative, not real.
+- Homepage stats and testimonials are illustrative, not real (unless Google Places reviews are configured — see
+  above).
 
 ## Common gotchas
 

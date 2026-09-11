@@ -10,6 +10,8 @@ import { PopupManager } from "@/components/layout/PopupManager";
 import { RecentPurchaseToast } from "@/components/layout/RecentPurchaseToast";
 import { AgeGate } from "@/components/layout/AgeGate";
 import { CartProvider } from "@/lib/cart-context";
+import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
+import { GoogleTagManagerHead, GoogleTagManagerBody } from "@/components/layout/GoogleTagManager";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -39,9 +41,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} ${instrumentSerif.variable} h-full antialiased`}>
       <head>
+        <GoogleTagManagerHead />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" />
       </head>
       <body className="flex min-h-full flex-col bg-ivory text-charcoal">
+        <GoogleTagManagerBody />
+        <GoogleAnalytics />
         <CartProvider>
           <AgeGate>
             <AnnouncementBar />
