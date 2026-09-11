@@ -11,11 +11,22 @@ const FLAT_SHIPPING = 15;
 const FEATURED_DISCOUNT = 25;
 const SECONDARY_DISCOUNT = 10;
 
+const US_STATES = [
+  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA",
+  "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+  "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT",
+  "VA","WA","WV","WI","WY","DC",
+];
+
+const CA_PROVINCES = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"];
+
 export function CheckoutClient() {
   const { lines, subtotal, addToCart } = useCart();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [addedIds, setAddedIds] = useState<string[]>([]);
+  const [country, setCountry] = useState<"CA" | "US">("CA");
+  const [orderNotes, setOrderNotes] = useState("");
 
   const shipping = subtotal >= SHIPPING_THRESHOLD || lines.length === 0 ? 0 : FLAT_SHIPPING;
   const total = subtotal + shipping;
@@ -49,6 +60,7 @@ export function CheckoutClient() {
       province: String(formData.get("province") || ""),
       postcode: String(formData.get("postcode") || ""),
       country: String(formData.get("country") || "CA"),
+      customerNote: orderNotes.trim() || undefined,
     };
 
     const checkoutLines = lines.map((l) => ({
@@ -116,17 +128,61 @@ export function CheckoutClient() {
               <Field label="Apartment, suite, etc. (optional)" name="address2" />
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <Field label="City" name="city" required />
-                <Field label="Province" name="province" required />
+                <div>
+                  <label htmlFor="province" className="mb-1.5 block text-sm font-semibold text-charcoal">
+                    {country === "CA" ? "Province" : "State"}
+                  </label>
+                  <select
+                    id="province"
+                    name="province"
+                    required
+                    defaultValue=""
+                    className="w-full rounded-md border border-stone bg-ivory px-4 py-2.5 text-sm outline-none transition focus:border-sage-deep"
+                  >
+                    <option value="" disabled>
+                      Select {country === "CA" ? "province" : "state"}...
+                    </option>
+                    {(country === "CA" ? CA_PROVINCES : US_STATES).map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <Field label="Postal code" name="postcode" required />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-charcoal">Country</label>
-                <select name="country" defaultValue="CA" className="w-full rounded-md border border-stone bg-ivory px-4 py-2.5 text-sm outline-none transition focus:border-sage-deep">
+                <label htmlFor="country" className="mb-1.5 block text-sm font-semibold text-charcoal">
+                  Country
+                </label>
+                <select
+                  id="country"
+                  name="country"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value as "CA" | "US")}
+                  className="w-full rounded-md border border-stone bg-ivory px-4 py-2.5 text-sm outline-none transition focus:border-sage-deep"
+                >
                   <option value="CA">Canada</option>
                   <option value="US">United States</option>
                 </select>
               </div>
             </div>
+          </div>
+
+          <div>
+            <label htmlFor="orderNotes" className="mb-1.5 block text-sm font-semibold text-charcoal">
+              Order notes <span className="font-normal normal-case text-charcoal/40">(optional)</span>
+            </label>
+            <textarea
+              id="orderNotes"
+              maxLength={500}
+              rows={3}
+              placeholder="Any special instructions or notes..."
+              value={orderNotes}
+              onChange={(e) => setOrderNotes(e.target.value)}
+              className="w-full resize-none rounded-md border border-stone bg-ivory px-4 py-2.5 text-sm outline-none transition placeholder:text-charcoal/40 focus:border-sage-deep"
+            />
+            <p className="mt-1 text-right text-xs text-charcoal/40">{orderNotes.length}/500</p>
           </div>
 
           {error && (

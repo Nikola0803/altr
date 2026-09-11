@@ -97,7 +97,7 @@ export function ShopMegaMenu({ onNavigate }: { onNavigate: () => void }) {
         </div>
 
         <div className="flex items-center justify-end gap-6 border-t border-stone px-8 py-4">
-          <Link href="/shop?category=peptides" onClick={onNavigate} className="text-xs font-medium text-charcoal/60 transition hover:text-sage-deep">
+          <Link href="/bundles" onClick={onNavigate} className="text-xs font-medium text-charcoal/60 transition hover:text-sage-deep">
             Bundles →
           </Link>
           <Link href="/quiz" onClick={onNavigate} className="text-xs font-medium text-charcoal/60 transition hover:text-sage-deep">

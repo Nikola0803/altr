@@ -59,6 +59,7 @@ export interface CheckoutCustomer {
   province: string;
   postcode: string;
   country: string;
+  customerNote?: string;
 }
 
 export interface CreateOrderResult {
@@ -115,6 +116,7 @@ export async function createWooOrder(lines: CheckoutLine[], customer: CheckoutCu
       product_id: l.product.wooProductId,
       quantity: l.qty,
     })),
+    customer_note: customer.customerNote ?? "",
   };
 
   const res = await fetch(`${WORDPRESS_URL}/wp-json/wc/v3/orders`, {
