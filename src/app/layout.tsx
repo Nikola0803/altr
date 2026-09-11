@@ -33,6 +33,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://altrpeptides.com"),
   title: "ALTR — The Standard. Not the Markup.",
   description: "Premium research compounds. Without the premium markup. Independently tested, every batch.",
 };
