@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Product } from "@/lib/types";
 import { ProductCard } from "@/components/product/ProductCard";
@@ -29,6 +29,16 @@ export function ShopClient({ products }: { products: Product[] }) {
   const [format, setFormat] = useState<Format | null>(null);
   const [sortAZ, setSortAZ] = useState(false);
   const [openPanel, setOpenPanel] = useState<"category" | "format" | null>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!openPanel) return;
+    function onClick(e: MouseEvent) {
+      if (toolbarRef.current && !toolbarRef.current.contains(e.target as Node)) setOpenPanel(null);
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [openPanel]);
 
   useEffect(() => {
     const searchFromUrl = searchParams.get("search");
@@ -89,7 +99,7 @@ export function ShopClient({ products }: { products: Product[] }) {
 
       <section className="sticky top-[90px] z-40 border-b border-stone bg-ivory/95 backdrop-blur-sm md:top-[100px]">
         <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <div className="relative flex items-center gap-2 overflow-x-auto py-4 md:gap-3">
+          <div ref={toolbarRef} className="relative flex items-center gap-2 overflow-x-auto py-4 md:gap-3">
             <button
               type="button"
               onClick={resetAll}

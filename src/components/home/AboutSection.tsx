@@ -1,4 +1,5 @@
 import { ButtonLink } from "@/components/ui/Button";
+import { Reveal } from "@/components/ui/Reveal";
 
 const STANDARDS = [
   { num: "01", title: "Independent Testing" },
@@ -11,13 +12,13 @@ export function AboutSection() {
   return (
     <section className="bg-ivory-soft py-20 md:py-32">
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-center gap-14 px-4 md:px-8 lg:grid-cols-2 lg:gap-20">
-        <div className="aspect-[4/5] w-full overflow-hidden rounded-lg bg-charcoal">
+        <Reveal className="aspect-[4/5] w-full overflow-hidden rounded-lg bg-charcoal">
           <video autoPlay loop muted playsInline className="h-full w-full object-cover">
             <source src="/videos/standard-vial.mp4" type="video/mp4" />
           </video>
-        </div>
+        </Reveal>
 
-        <div>
+        <Reveal>
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-sage-deep">The ALTR Standard</p>
           <h2 className="font-display text-4xl font-bold leading-tight text-charcoal md:text-5xl">
             Precision
@@ -41,7 +42,7 @@ export function AboutSection() {
           <ButtonLink href="/lab-results" className="mt-10">
             Explore Our Standards <i className="ri-arrow-right-line" />
           </ButtonLink>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

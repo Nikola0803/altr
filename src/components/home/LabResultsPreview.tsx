@@ -1,10 +1,23 @@
-const METHODS = ["HPLC", "LC-MS", "Third-Party Laboratory"];
+import { ButtonLink } from "@/components/ui/Button";
+import { Reveal } from "@/components/ui/Reveal";
+import { MolecularMotif } from "@/components/ui/MolecularMotif";
+import { BatchVerifyTerminal } from "./BatchVerifyTerminal";
 
 export function LabResultsPreview() {
   return (
-    <section className="bg-charcoal py-20 text-white md:py-32">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-center gap-14 px-4 md:grid-cols-2 md:px-8 lg:gap-24">
-        <div>
+    <section className="relative overflow-hidden bg-charcoal py-20 text-white md:py-32">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-40 top-1/2 h-[520px] w-[520px] -translate-y-1/2 rounded-full opacity-40"
+        style={{ background: "radial-gradient(circle, rgba(151,164,148,0.16) 0%, rgba(151,164,148,0) 70%)" }}
+      />
+      <MolecularMotif
+        variant="concentric"
+        className="pointer-events-none absolute -right-16 top-1/2 hidden h-[440px] w-[440px] -translate-y-1/2 lg:block"
+      />
+
+      <div className="relative mx-auto grid max-w-[1400px] grid-cols-1 items-center gap-14 px-4 md:grid-cols-5 md:px-8 lg:gap-16">
+        <Reveal className="md:col-span-2">
           <div className="mb-4 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">
             <span className="h-px w-8 bg-white/30" />
             Transparency
@@ -15,46 +28,17 @@ export function LabResultsPreview() {
             Verified.
           </h2>
           <p className="mt-6 max-w-md text-base leading-relaxed text-white/60 md:text-lg">
-            Independent laboratory testing and batch-level documentation for greater transparency.
+            Every order ships with a Certificate of Analysis for its exact lot. Enter a batch code and pull the real
+            result, not a demo.
           </p>
-          <a href="/lab-results" className="mt-9 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-white transition hover:text-sage-light">
-            View Lab Results <i className="ri-arrow-right-line" />
-          </a>
-        </div>
+          <ButtonLink href="/lab-results" variant="secondary" size="lg" className="mt-9 !border-white/40 !text-ivory hover:!border-sage-light hover:!bg-transparent hover:!text-sage-light">
+            View All Lab Results <i className="ri-arrow-right-line" />
+          </ButtonLink>
+        </Reveal>
 
-        <div className="rounded-lg bg-ivory p-8 text-charcoal md:p-10">
-          <div className="flex items-start justify-between border-b border-stone pb-6">
-            <div>
-              <p className="text-[11px] uppercase tracking-wider text-charcoal/50">Certificate of Analysis</p>
-              <p className="mt-1 font-display text-xl font-bold">BPC-157</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[11px] uppercase tracking-wider text-charcoal/50">Lot</p>
-              <p className="mt-1 font-mono text-sm text-charcoal/70">#BPC-2608</p>
-            </div>
-          </div>
-
-          <div className="border-b border-stone py-8 text-center">
-            <p className="font-display text-5xl font-bold text-charcoal">99.2%</p>
-            <p className="mt-2 text-[11px] uppercase tracking-wider text-charcoal/50">Tested Purity</p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 border-b border-stone py-6 text-center">
-            {METHODS.map((method) => (
-              <div key={method} className="flex flex-col items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full border border-sage-deep text-sage-deep">
-                  <i className="ri-check-line text-sm" />
-                </span>
-                <span className="text-[10px] uppercase tracking-wider text-charcoal/60">{method}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-between pt-6">
-            <span className="text-[11px] uppercase tracking-wider text-charcoal/50">Verified Independently</span>
-            <span className="text-sm font-bold uppercase tracking-wide text-sage-deep">Pass</span>
-          </div>
-        </div>
+        <Reveal className="md:col-span-3">
+          <BatchVerifyTerminal />
+        </Reveal>
       </div>
     </section>
   );

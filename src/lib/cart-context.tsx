@@ -22,6 +22,7 @@ interface CartContextValue {
   count: number;
   subtotal: number;
   isOpen: boolean;
+  toastMessage: string | null;
   openCart: () => void;
   closeCart: () => void;
   addToCart: (product: Product, qty: number, unitPrice: number, packLabel: string, opts?: { silent?: boolean }) => void;
@@ -35,6 +36,8 @@ const STORAGE_KEY = "altr-cart-v1";
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimer = useRef<number | undefined>(undefined);
   const hydrated = useRef(false);
 
   // Hydrate from localStorage once on mount, resolving stored productIds
@@ -85,6 +88,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return [...prev, { product, qty, unitPrice, packLabel }];
     });
 
+    setToastMessage(`${product.name} added to cart`);
+    window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToastMessage(null), 2600);
+
     if (!opts?.silent) setIsOpen(true);
   }, []);
 
@@ -107,8 +114,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const subtotal = useMemo(() => lines.reduce((sum, l) => sum + l.qty * l.unitPrice, 0), [lines]);
 
   const value = useMemo(
-    () => ({ lines, count, subtotal, isOpen, openCart, closeCart, addToCart, removeLine, updateQty }),
-    [lines, count, subtotal, isOpen, openCart, closeCart, addToCart, removeLine, updateQty]
+    () => ({ lines, count, subtotal, isOpen, toastMessage, openCart, closeCart, addToCart, removeLine, updateQty }),
+    [lines, count, subtotal, isOpen, toastMessage, openCart, closeCart, addToCart, removeLine, updateQty]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

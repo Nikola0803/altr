@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 const ARTICLES = [
   {
@@ -25,7 +26,7 @@ export function ScienceSection() {
   return (
     <section className="bg-ivory py-20 md:py-32">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-        <div className="mb-16 max-w-2xl md:mb-24">
+        <Reveal className="mb-16 max-w-2xl md:mb-24">
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-sage-deep">The Science</p>
           <h2 className="font-display text-4xl font-bold leading-tight text-charcoal md:text-5xl">
             Research deserves
@@ -36,9 +37,9 @@ export function ScienceSection() {
             Explore how ALTR approaches testing, documentation, handling and transparency across every research
             compound.
           </p>
-        </div>
+        </Reveal>
 
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8">
+        <Reveal stagger className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8">
           {ARTICLES.map((article) => (
             <article key={article.title} className="group">
               <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-sage-mist">
@@ -59,7 +60,7 @@ export function ScienceSection() {
               </span>
             </article>
           ))}
-        </div>
+        </Reveal>
       </div>
     </section>
   );

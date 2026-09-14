@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Reveal } from "@/components/ui/Reveal";
 
 const CATEGORIES = [
   { title: "Recovery & Tissue Research", compounds: "BPC-157 · TB-500", href: "/shop?category=peptides", art: "botanical" as const },
@@ -11,10 +12,12 @@ export function ShopByCategory() {
   return (
     <section className="bg-ivory-soft py-20 md:py-32">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-sage-deep">Explore the Collection</p>
-        <h2 className="max-w-xl font-display text-3xl font-bold text-charcoal md:text-4xl">Shop by research category</h2>
+        <Reveal>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-sage-deep">Explore the Collection</p>
+          <h2 className="max-w-xl font-display text-3xl font-bold text-charcoal md:text-4xl">Shop by research category</h2>
+        </Reveal>
 
-        <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+        <Reveal stagger className="mt-12 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
           {CATEGORIES.map((cat) => (
             <Link key={cat.title} href={cat.href} className="group block">
               <div className="aspect-[4/5] w-full overflow-hidden rounded-lg">
@@ -24,7 +27,7 @@ export function ShopByCategory() {
               <p className="mt-1.5 text-xs uppercase tracking-[0.1em] text-soft-gray">{cat.compounds}</p>
             </Link>
           ))}
-        </div>
+        </Reveal>
       </div>
     </section>
   );
