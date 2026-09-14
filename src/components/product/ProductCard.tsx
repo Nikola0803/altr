@@ -9,6 +9,7 @@ import { PackSelector, usePackSelection } from "./PackSelector";
 import { useCart } from "@/lib/cart-context";
 import { getProductCoa } from "@/lib/coa";
 import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
+import { RatingStars } from "@/components/ui/RatingStars";
 
 const DOSAGE_PATTERN = /\s(\d+(?:\.\d+)?\s?(?:mg|mcg|iu|g)(?:\/\d+(?:\.\d+)?\s?(?:mg|mcg|iu|g))?)$/i;
 
@@ -91,7 +92,10 @@ export function ProductCard({ product }: { product: Product }) {
       </Link>
 
       <div className="flex flex-1 flex-col pt-7">
-        <span className="mb-2 text-[10px] font-medium uppercase tracking-[0.2em] text-charcoal/40">{product.categoryLabel}</span>
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-charcoal/40">{product.categoryLabel}</span>
+          <RatingStars rating={product.rating} reviewCount={product.reviewCount} />
+        </div>
         <Link href={`/shop/${product.slug}`} className="font-display text-lg font-medium tracking-tight text-charcoal transition hover:opacity-60">
           {title}
         </Link>

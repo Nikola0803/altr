@@ -50,6 +50,7 @@ export function PackSelector({
           <button
             key={pack.label}
             type="button"
+            aria-pressed={packIndex === i}
             onClick={() => onSelect(i)}
             className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium tracking-wide transition ${
               packIndex === i

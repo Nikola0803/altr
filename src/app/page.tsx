@@ -7,6 +7,7 @@ import { ScienceSection } from "@/components/home/ScienceSection";
 import { LabResultsPreview } from "@/components/home/LabResultsPreview";
 import { Testimonials } from "@/components/home/Testimonials";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
+import { FaqHomeSection } from "@/components/home/FaqHomeSection";
 import { ValueSection } from "@/components/home/ValueSection";
 import { FinalCta } from "@/components/home/FinalCta";
 import { googleReviewsConfigured } from "@/lib/google-reviews";
@@ -31,11 +32,12 @@ export default function Home() {
       <Hero />
       <TrustIconRow items={HOME_TRUST_ITEMS} marquee />
       <FeaturedProducts />
+      {showGoogleReviews ? <ReviewsSection /> : <Testimonials />}
       <ShopByCategory />
       <AboutSection />
-      <ScienceSection />
       <LabResultsPreview />
-      {showGoogleReviews ? <ReviewsSection /> : <Testimonials />}
+      <ScienceSection />
+      <FaqHomeSection />
       <ValueSection />
       <FinalCta />
     </>

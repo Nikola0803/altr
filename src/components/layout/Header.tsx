@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { useCart } from "@/lib/cart-context";
@@ -19,8 +19,18 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [shopMenuOpen, setShopMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const closeTimer = useRef<number | undefined>(undefined);
   const { count, openCart } = useCart();
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 24);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   function openShopMenu() {
     window.clearTimeout(closeTimer.current);
@@ -31,8 +41,16 @@ export function Header() {
   }
 
   return (
-    <header className="fixed top-[32px] right-0 left-0 z-50 bg-charcoal/20 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-4 md:px-8 md:py-5">
+    <header
+      className={`fixed top-[32px] right-0 left-0 z-50 backdrop-blur-sm transition-colors duration-300 ${
+        scrolled ? "bg-charcoal/95 shadow-sm shadow-black/20" : "bg-charcoal/20"
+      }`}
+    >
+      <div
+        className={`mx-auto flex max-w-[1400px] items-center justify-between px-4 transition-[padding] duration-300 md:px-8 ${
+          scrolled ? "py-2.5 md:py-3" : "py-4 md:py-5"
+        }`}
+      >
         <Logo tone="ivory" className="shrink-0 text-lg md:text-xl" />
 
         <nav className="hidden items-center gap-7 text-[11px] font-medium uppercase tracking-[0.14em] text-white/85 md:flex lg:gap-9">

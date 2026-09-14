@@ -5,6 +5,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/layout/CartDrawer";
+import { CartToast } from "@/components/layout/CartToast";
 import { QuizPopup } from "@/components/layout/QuizPopup";
 import { PopupManager } from "@/components/layout/PopupManager";
 import { RecentPurchaseToast } from "@/components/layout/RecentPurchaseToast";
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <main className="flex-1 pt-[90px] md:pt-[100px]">{children}</main>
             <Footer />
             <CartDrawer />
+            <CartToast />
             <QuizPopup />
             <PopupManager />
             <RecentPurchaseToast />
