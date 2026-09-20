@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { useCart } from "@/lib/cart-context";
 import { SearchOverlay } from "./SearchOverlay";
-import { ShopMegaMenu } from "./ShopMegaMenu";
 
 const NAV = [
   { href: "/shop", label: "Shop" },
@@ -18,9 +17,7 @@ const NAV = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [shopMenuOpen, setShopMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const closeTimer = useRef<number | undefined>(undefined);
   const { count, openCart } = useCart();
 
   useEffect(() => {
@@ -31,14 +28,6 @@ export function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  function openShopMenu() {
-    window.clearTimeout(closeTimer.current);
-    setShopMenuOpen(true);
-  }
-  function scheduleCloseShopMenu() {
-    closeTimer.current = window.setTimeout(() => setShopMenuOpen(false), 150);
-  }
 
   return (
     <header
@@ -54,19 +43,11 @@ export function Header() {
         <Logo tone="ivory" className="shrink-0 text-lg md:text-xl" />
 
         <nav className="hidden items-center gap-7 text-[11px] font-medium uppercase tracking-[0.14em] text-white/85 md:flex lg:gap-9">
-          {NAV.map((item) =>
-            item.href === "/shop" ? (
-              <span key={item.href} onMouseEnter={openShopMenu} onMouseLeave={scheduleCloseShopMenu}>
-                <Link href={item.href} className="whitespace-nowrap transition hover:text-white">
-                  {item.label}
-                </Link>
-              </span>
-            ) : (
-              <Link key={item.href} href={item.href} className="whitespace-nowrap transition hover:text-white">
-                {item.label}
-              </Link>
-            )
-          )}
+          {NAV.map((item) => (
+            <Link key={item.href} href={item.href} className="whitespace-nowrap transition hover:text-white">
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         <div className="flex items-center gap-1 md:gap-2">
@@ -110,12 +91,6 @@ export function Header() {
             </Link>
           ))}
         </nav>
-      )}
-
-      {shopMenuOpen && (
-        <div onMouseEnter={openShopMenu} onMouseLeave={scheduleCloseShopMenu}>
-          <ShopMegaMenu onNavigate={() => setShopMenuOpen(false)} />
-        </div>
       )}
 
       <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
