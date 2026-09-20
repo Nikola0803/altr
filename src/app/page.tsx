@@ -1,7 +1,6 @@
 import { Hero } from "@/components/home/Hero";
 import { TrustIconRow } from "@/components/ui/TrustIconRow";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
-import { ShopByCategory } from "@/components/home/ShopByCategory";
 import { AboutSection } from "@/components/home/AboutSection";
 import { ScienceSection } from "@/components/home/ScienceSection";
 import { LabResultsPreview } from "@/components/home/LabResultsPreview";
@@ -33,7 +32,6 @@ export default function Home() {
       <TrustIconRow items={HOME_TRUST_ITEMS} marquee />
       <FeaturedProducts />
       {showGoogleReviews ? <ReviewsSection /> : <Testimonials />}
-      <ShopByCategory />
       <AboutSection />
       <LabResultsPreview />
       <ScienceSection />
