@@ -10,6 +10,11 @@ const SHIPPING_THRESHOLD = 400;
 const FLAT_SHIPPING = 15;
 const FEATURED_DISCOUNT = 25;
 const SECONDARY_DISCOUNT = 10;
+// HST applies to Canadian orders only (Ontario rate) -- charged on the
+// goods + shipping subtotal, standard Canadian ecommerce practice. US
+// orders don't get Canadian HST; US sales tax is a separate nexus-based
+// system this checkout doesn't handle yet.
+const HST_RATE = 0.13;
 
 const US_STATES = [
   "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA",
@@ -29,7 +34,8 @@ export function CheckoutClient() {
   const [orderNotes, setOrderNotes] = useState("");
 
   const shipping = subtotal >= SHIPPING_THRESHOLD || lines.length === 0 ? 0 : FLAT_SHIPPING;
-  const total = subtotal + shipping;
+  const tax = country === "CA" ? (subtotal + shipping) * HST_RATE : 0;
+  const total = subtotal + shipping + tax;
   const shippingRemaining = Math.max(0, SHIPPING_THRESHOLD - subtotal);
   const shippingProgress = Math.min(100, (subtotal / SHIPPING_THRESHOLD) * 100);
 
@@ -272,6 +278,12 @@ export function CheckoutClient() {
               <span>Shipping</span>
               <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
             </div>
+            {tax > 0 && (
+              <div className="flex justify-between text-charcoal/60">
+                <span>HST (13%)</span>
+                <span>${tax.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between border-t border-stone pt-2 text-base font-bold text-charcoal">
               <span>Total</span>
               <span>${total.toFixed(2)} CAD</span>

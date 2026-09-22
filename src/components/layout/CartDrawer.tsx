@@ -163,10 +163,11 @@ export function CartDrawer() {
             </div>
 
             <div className="border-t border-stone px-5 py-4">
-              <div className="mb-3 flex items-center justify-between text-sm">
+              <div className="mb-1 flex items-center justify-between text-sm">
                 <span className="text-charcoal/60">Subtotal</span>
                 <span className="font-display text-lg font-bold text-charcoal">${subtotal.toFixed(2)} CAD</span>
               </div>
+              <p className="mb-3 text-xs text-charcoal/40">Taxes and shipping calculated at checkout.</p>
               <button
                 type="button"
                 onClick={handleCheckout}
