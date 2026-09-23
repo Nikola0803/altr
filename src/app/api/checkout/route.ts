@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
       {
         error: "store_not_connected",
         message:
-          "This store isn't connected to WooCommerce yet. Set WORDPRESS_URL, WOOCOMMERCE_CONSUMER_KEY and WOOCOMMERCE_CONSUMER_SECRET to enable checkout.",
+          "This store isn't connected to WooCommerce yet. Set WORDPRESS_URL and either (WOOCOMMERCE_CONSUMER_KEY + WOOCOMMERCE_CONSUMER_SECRET) or (WORDPRESS_USERNAME + WORDPRESS_APP_PASSWORD) to enable checkout.",
       },
       { status: 501 }
     );
