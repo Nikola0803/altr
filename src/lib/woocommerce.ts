@@ -1,31 +1,29 @@
 /**
  * Headless WooCommerce connection.
  *
- * Reads (product catalog) still come from lib/products.ts mock data — see
- * the TODOs below for swapping those to live WooCommerce REST calls.
+ * Authentication — two methods are supported; set exactly one in .env.local:
  *
- * Checkout (order creation) is implemented against the WooCommerce REST API
- * v3 Orders endpoint: https://woocommerce.github.io/woocommerce-rest-api-docs/#orders
+ *   METHOD A — WooCommerce Consumer Key/Secret (traditional):
+ *     WOOCOMMERCE_CONSUMER_KEY=ck_...
+ *     WOOCOMMERCE_CONSUMER_SECRET=cs_...
  *
- * Flow: the Next.js server creates a `pending` order via the REST API (auth'd
- * with consumer key/secret, server-side only), then redirects the customer
- * to WooCommerce's own hosted "pay for order" page so WooCommerce — not this
- * app — handles the actual payment gateway (Stripe/PayPal/etc, whatever is
- * configured in WP admin). This avoids needing a PCI-compliant payment form
- * inside Next.js and reuses whatever gateways are already set up in Woo.
+ *   METHOD B — WordPress Application Password (works with api.altrpeptides.com's
+ *     api-lockdown.php because WP app-password auth runs before rest_authentication_errors
+ *     and sets is_user_logged_in() = true, bypassing the lockdown):
+ *     WORDPRESS_USERNAME=realadmin
+ *     WORDPRESS_APP_PASSWORD=xxxx xxxx xxxx xxxx xxxx xxxx   (spaces ok, WP strips them)
  *
- * Env vars required (see .env.example):
- *   WORDPRESS_URL=              e.g. https://shop.altrpeptides.com
- *   WOOCOMMERCE_CONSUMER_KEY=
- *   WOOCOMMERCE_CONSUMER_SECRET=
+ * Common to both:
+ *   WORDPRESS_URL=https://api.altrpeptides.com
  *
- * IMPORTANT — product ID mapping: WooCommerce's Orders API line_items need a
- * real WooCommerce `product_id`, not this app's mock `Product.id`/`slug`.
- * Once the real catalog is imported into WooCommerce (e.g. via the ALTR CMS
- * plugin or a CSV import), each mock product needs its real WC product_id
- * attached — see `wooProductId` TODO on the Product type / a lookup table.
- * Until that mapping exists, `createWooOrder` will fail per-line with a
- * clear error rather than silently placing an order for the wrong item.
+ * Checkout flow: Next.js server creates a `pending` WooCommerce order via the
+ * WC REST API v3 Orders endpoint, then redirects the customer to WooCommerce's
+ * own hosted "pay for order" page so WooCommerce/Stripe handles the actual charge.
+ * This app never touches card details directly.
+ *
+ * IMPORTANT — product ID mapping: line_items need real WooCommerce `product_id`
+ * values. Set `wooProductId` on each Product in lib/products.ts once the catalog
+ * is imported into WooCommerce.
  */
 
 import { Product } from "./types";
@@ -33,12 +31,30 @@ import { Product } from "./types";
 const WORDPRESS_URL = process.env.WORDPRESS_URL;
 const CONSUMER_KEY = process.env.WOOCOMMERCE_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.WOOCOMMERCE_CONSUMER_SECRET;
+const WP_USERNAME = process.env.WORDPRESS_USERNAME;
+const WP_APP_PASSWORD = process.env.WORDPRESS_APP_PASSWORD;
 
-export function isWooCommerceConfigured() {
-  return Boolean(WORDPRESS_URL && CONSUMER_KEY && CONSUMER_SECRET);
+function getAuthHeader(): string {
+  if (CONSUMER_KEY && CONSUMER_SECRET) {
+    return "Basic " + Buffer.from(`${CONSUMER_KEY}:${CONSUMER_SECRET}`).toString("base64");
+  }
+  if (WP_USERNAME && WP_APP_PASSWORD) {
+    // WP Application Passwords allow spaces in the password value; strip them here
+    // since Basic Auth encodes the raw string and WP accepts both forms.
+    const pass = WP_APP_PASSWORD.replace(/\s+/g, "");
+    return "Basic " + Buffer.from(`${WP_USERNAME}:${pass}`).toString("base64");
+  }
+  throw new Error("No WooCommerce auth credentials configured.");
 }
 
-// TODO: implement once credentials are available.
+export function isWooCommerceConfigured() {
+  if (!WORDPRESS_URL) return false;
+  const hasConsumerKeys = Boolean(CONSUMER_KEY && CONSUMER_SECRET);
+  const hasAppPassword = Boolean(WP_USERNAME && WP_APP_PASSWORD);
+  return hasConsumerKeys || hasAppPassword;
+}
+
+// TODO: implement once credentials are verified.
 // export async function fetchWooProducts(): Promise<Product[]> { ... }
 // export async function fetchWooProductBySlug(slug: string): Promise<Product | null> { ... }
 
@@ -75,7 +91,11 @@ export interface CreateOrderResult {
  */
 export async function createWooOrder(lines: CheckoutLine[], customer: CheckoutCustomer): Promise<CreateOrderResult> {
   if (!isWooCommerceConfigured()) {
-    throw new Error("WooCommerce is not configured — set WORDPRESS_URL, WOOCOMMERCE_CONSUMER_KEY and WOOCOMMERCE_CONSUMER_SECRET.");
+    throw new Error(
+      "WooCommerce is not configured. Set WORDPRESS_URL and either " +
+        "(WOOCOMMERCE_CONSUMER_KEY + WOOCOMMERCE_CONSUMER_SECRET) or " +
+        "(WORDPRESS_USERNAME + WORDPRESS_APP_PASSWORD)."
+    );
   }
 
   const unmapped = lines.filter((l) => !l.product.wooProductId);
@@ -85,8 +105,6 @@ export async function createWooOrder(lines: CheckoutLine[], customer: CheckoutCu
         `Import the catalog into WooCommerce and set wooProductId on each Product before checkout can go live.`
     );
   }
-
-  const auth = Buffer.from(`${CONSUMER_KEY}:${CONSUMER_SECRET}`).toString("base64");
 
   const payload = {
     status: "pending",
@@ -123,7 +141,7 @@ export async function createWooOrder(lines: CheckoutLine[], customer: CheckoutCu
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Basic ${auth}`,
+      Authorization: getAuthHeader(),
     },
     body: JSON.stringify(payload),
   });
