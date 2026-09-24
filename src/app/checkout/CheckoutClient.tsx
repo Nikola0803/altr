@@ -10,20 +10,60 @@ const SHIPPING_THRESHOLD = 400;
 const FLAT_SHIPPING = 15;
 const FEATURED_DISCOUNT = 25;
 const SECONDARY_DISCOUNT = 10;
-// HST applies to Canadian orders only (Ontario rate) -- charged on the
-// goods + shipping subtotal, standard Canadian ecommerce practice. US
-// orders don't get Canadian HST; US sales tax is a separate nexus-based
-// system this checkout doesn't handle yet.
-const HST_RATE = 0.13;
 
-const US_STATES = [
-  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA",
-  "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
-  "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT",
-  "VA","WA","WV","WI","WY","DC",
+// Canadian provincial/territorial tax rates (GST/HST/PST/QST).
+// US orders: no Canadian tax; US sales tax is nexus-based and not handled here.
+const CA_TAX: Record<string, { rate: number; label: string }> = {
+  AB: { rate: 0.05,    label: "GST (5%)" },
+  BC: { rate: 0.12,    label: "GST + PST (12%)" },
+  MB: { rate: 0.12,    label: "GST + PST (12%)" },
+  NB: { rate: 0.15,    label: "HST (15%)" },
+  NL: { rate: 0.15,    label: "HST (15%)" },
+  NS: { rate: 0.15,    label: "HST (15%)" },
+  NT: { rate: 0.05,    label: "GST (5%)" },
+  NU: { rate: 0.05,    label: "GST (5%)" },
+  ON: { rate: 0.13,    label: "HST (13%)" },
+  PE: { rate: 0.15,    label: "HST (15%)" },
+  QC: { rate: 0.14975, label: "GST + QST (14.975%)" },
+  SK: { rate: 0.11,    label: "GST + PST (11%)" },
+  YT: { rate: 0.05,    label: "GST (5%)" },
+};
+
+const CA_PROVINCES = [
+  { code: "AB", name: "Alberta" },
+  { code: "BC", name: "British Columbia" },
+  { code: "MB", name: "Manitoba" },
+  { code: "NB", name: "New Brunswick" },
+  { code: "NL", name: "Newfoundland and Labrador" },
+  { code: "NS", name: "Nova Scotia" },
+  { code: "NT", name: "Northwest Territories" },
+  { code: "NU", name: "Nunavut" },
+  { code: "ON", name: "Ontario" },
+  { code: "PE", name: "Prince Edward Island" },
+  { code: "QC", name: "Quebec" },
+  { code: "SK", name: "Saskatchewan" },
+  { code: "YT", name: "Yukon" },
 ];
 
-const CA_PROVINCES = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"];
+const US_STATES = [
+  { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
+  { code: "AR", name: "Arkansas" }, { code: "CA", name: "California" }, { code: "CO", name: "Colorado" },
+  { code: "CT", name: "Connecticut" }, { code: "DE", name: "Delaware" }, { code: "FL", name: "Florida" },
+  { code: "GA", name: "Georgia" }, { code: "HI", name: "Hawaii" }, { code: "ID", name: "Idaho" },
+  { code: "IL", name: "Illinois" }, { code: "IN", name: "Indiana" }, { code: "IA", name: "Iowa" },
+  { code: "KS", name: "Kansas" }, { code: "KY", name: "Kentucky" }, { code: "LA", name: "Louisiana" },
+  { code: "ME", name: "Maine" }, { code: "MD", name: "Maryland" }, { code: "MA", name: "Massachusetts" },
+  { code: "MI", name: "Michigan" }, { code: "MN", name: "Minnesota" }, { code: "MS", name: "Mississippi" },
+  { code: "MO", name: "Missouri" }, { code: "MT", name: "Montana" }, { code: "NE", name: "Nebraska" },
+  { code: "NV", name: "Nevada" }, { code: "NH", name: "New Hampshire" }, { code: "NJ", name: "New Jersey" },
+  { code: "NM", name: "New Mexico" }, { code: "NY", name: "New York" }, { code: "NC", name: "North Carolina" },
+  { code: "ND", name: "North Dakota" }, { code: "OH", name: "Ohio" }, { code: "OK", name: "Oklahoma" },
+  { code: "OR", name: "Oregon" }, { code: "PA", name: "Pennsylvania" }, { code: "RI", name: "Rhode Island" },
+  { code: "SC", name: "South Carolina" }, { code: "SD", name: "South Dakota" }, { code: "TN", name: "Tennessee" },
+  { code: "TX", name: "Texas" }, { code: "UT", name: "Utah" }, { code: "VT", name: "Vermont" },
+  { code: "VA", name: "Virginia" }, { code: "WA", name: "Washington" }, { code: "WV", name: "West Virginia" },
+  { code: "WI", name: "Wisconsin" }, { code: "WY", name: "Wyoming" }, { code: "DC", name: "Washington D.C." },
+];
 
 export function CheckoutClient() {
   const { lines, subtotal, addToCart } = useCart();
@@ -31,10 +71,14 @@ export function CheckoutClient() {
   const [error, setError] = useState<string | null>(null);
   const [addedIds, setAddedIds] = useState<string[]>([]);
   const [country, setCountry] = useState<"CA" | "US">("CA");
+  const [province, setProvince] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
 
   const shipping = subtotal >= SHIPPING_THRESHOLD || lines.length === 0 ? 0 : FLAT_SHIPPING;
-  const tax = country === "CA" ? (subtotal + shipping) * HST_RATE : 0;
+  const provinceTax = country === "CA" && province ? CA_TAX[province] : null;
+  const taxRate = provinceTax?.rate ?? 0;
+  const taxLabel = provinceTax?.label ?? "Tax";
+  const tax = taxRate > 0 ? (subtotal + shipping) * taxRate : 0;
   const total = subtotal + shipping + tax;
   const shippingRemaining = Math.max(0, SHIPPING_THRESHOLD - subtotal);
   const shippingProgress = Math.min(100, (subtotal / SHIPPING_THRESHOLD) * 100);
@@ -142,15 +186,16 @@ export function CheckoutClient() {
                     id="province"
                     name="province"
                     required
-                    defaultValue=""
+                    value={province}
+                    onChange={(e) => setProvince(e.target.value)}
                     className="w-full rounded-md border border-stone bg-ivory px-4 py-2.5 text-sm outline-none transition focus:border-sage-deep"
                   >
                     <option value="" disabled>
                       Select {country === "CA" ? "province" : "state"}...
                     </option>
                     {(country === "CA" ? CA_PROVINCES : US_STATES).map((s) => (
-                      <option key={s} value={s}>
-                        {s}
+                      <option key={s.code} value={s.code}>
+                        {s.name}
                       </option>
                     ))}
                   </select>
@@ -165,7 +210,7 @@ export function CheckoutClient() {
                   id="country"
                   name="country"
                   value={country}
-                  onChange={(e) => setCountry(e.target.value as "CA" | "US")}
+                  onChange={(e) => { setCountry(e.target.value as "CA" | "US"); setProvince(""); }}
                   className="w-full rounded-md border border-stone bg-ivory px-4 py-2.5 text-sm outline-none transition focus:border-sage-deep"
                 >
                   <option value="CA">Canada</option>
@@ -278,10 +323,22 @@ export function CheckoutClient() {
               <span>Shipping</span>
               <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
             </div>
+            {country === "CA" && !province && (
+              <div className="flex justify-between text-charcoal/60">
+                <span>Tax</span>
+                <span className="text-charcoal/40 text-xs">Select province</span>
+              </div>
+            )}
             {tax > 0 && (
               <div className="flex justify-between text-charcoal/60">
-                <span>HST (13%)</span>
+                <span>{taxLabel}</span>
                 <span>${tax.toFixed(2)}</span>
+              </div>
+            )}
+            {country === "CA" && province && tax === 0 && (
+              <div className="flex justify-between text-charcoal/60">
+                <span>{taxLabel}</span>
+                <span>$0.00</span>
               </div>
             )}
             <div className="flex justify-between border-t border-stone pt-2 text-base font-bold text-charcoal">
