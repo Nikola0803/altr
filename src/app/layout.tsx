@@ -13,6 +13,7 @@ import { AgeGate } from "@/components/layout/AgeGate";
 import { CartProvider } from "@/lib/cart-context";
 import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
 import { GoogleTagManagerHead, GoogleTagManagerBody } from "@/components/layout/GoogleTagManager";
+import { MetaPixel } from "@/components/layout/MetaPixel";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col bg-ivory text-charcoal">
         <GoogleTagManagerBody />
         <GoogleAnalytics />
+        <MetaPixel />
         <CartProvider>
           <AgeGate>
             <AnnouncementBar />
