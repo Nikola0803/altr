@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, ReactNode } from "react";
 import { Product } from "./types";
+import { pixelTrack } from "./meta-pixel";
 
 interface CartLine {
   product: Product;
@@ -86,6 +87,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return next;
       }
       return [...prev, { product, qty, unitPrice, packLabel }];
+    });
+
+    pixelTrack("AddToCart", {
+      content_ids: [product.sku || product.id],
+      content_name: product.name,
+      content_type: "product",
+      value: unitPrice * qty,
+      currency: "CAD",
     });
 
     setToastMessage(`${product.name} added to cart`);

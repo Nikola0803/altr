@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/cart-context";
 import { getCartUpsellProducts } from "@/lib/upsells";
+import { pixelTrack } from "@/lib/meta-pixel";
 
 const SHIPPING_THRESHOLD = 400;
 const FLAT_SHIPPING = 15;
@@ -82,6 +83,18 @@ export function CheckoutClient() {
   const total = subtotal + shipping + tax;
   const shippingRemaining = Math.max(0, SHIPPING_THRESHOLD - subtotal);
   const shippingProgress = Math.min(100, (subtotal / SHIPPING_THRESHOLD) * 100);
+
+  const initiatedRef = useRef(false);
+  useEffect(() => {
+    if (initiatedRef.current || lines.length === 0) return;
+    initiatedRef.current = true;
+    pixelTrack("InitiateCheckout", {
+      content_ids: lines.map((l) => l.product.sku || l.product.id),
+      num_items: lines.reduce((sum, l) => sum + l.qty, 0),
+      value: subtotal,
+      currency: "CAD",
+    });
+  }, [lines, subtotal]);
 
   const cartProductIds = lines.map((l) => l.product.id);
   const upsells = getCartUpsellProducts(cartProductIds, 4);

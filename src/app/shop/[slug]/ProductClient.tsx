@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
@@ -10,6 +10,7 @@ import { useCart } from "@/lib/cart-context";
 import { getProductCoa } from "@/lib/coa";
 import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
 import { getCartUpsellProducts } from "@/lib/upsells";
+import { pixelTrack } from "@/lib/meta-pixel";
 
 const TABS = ["Description", "Reviews", "Lab Report"] as const;
 
@@ -34,6 +35,17 @@ export function ProductClient({ product }: { product: Product }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>("Description");
   const [viewing, setViewing] = useState<{ url: string; title: string } | null>(null);
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    pixelTrack("ViewContent", {
+      content_ids: [product.sku || product.id],
+      content_name: product.name,
+      content_type: "product",
+      value: selected.unitPrice,
+      currency: "CAD",
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id]);
 
   const lineTotal = selected.unitPrice * qty * selected.qty;
   const shippingThreshold = 400;
