@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createWooOrder, isWooCommerceConfigured, CheckoutLine, CheckoutCustomer } from "@/lib/woocommerce";
 import { sendPurchaseEvent } from "@/lib/meta-capi";
+import { insertEvent, isAnalyticsConfigured } from "@/lib/analytics-db";
 
 export async function POST(req: NextRequest) {
   if (!isWooCommerceConfigured()) {
@@ -45,6 +46,22 @@ export async function POST(req: NextRequest) {
       fbp: req.cookies.get("_fbp")?.value,
       fbc: req.cookies.get("_fbc")?.value,
     });
+
+    // Analytics purchase event (non-blocking, server-side attribution)
+    if (isAnalyticsConfigured()) {
+      const sessionId = req.cookies.get("altr_asid")?.value ?? req.headers.get("x-analytics-session") ?? "server";
+      const fbSource = req.cookies.get("_fbc")?.value ? "meta_ads" : undefined;
+      insertEvent({
+        event_type: "purchase",
+        session_id: sessionId,
+        page_path: "/checkout",
+        order_id: String(result.orderId),
+        order_value: total,
+        order_currency: "CAD",
+        traffic_source: fbSource,
+        is_new_session: false,
+      }).catch(() => {});
+    }
 
     return NextResponse.json(result);
   } catch (err) {
