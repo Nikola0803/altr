@@ -9,7 +9,7 @@ export function Hero() {
         muted
         playsInline
         className="absolute inset-0 h-full w-full scale-110 object-cover"
-        poster="/images/hero-vial.jpg"
+        poster="/images/hero-poster.jpg"
       >
         <source src="/videos/hero-water-2.mp4" type="video/mp4" />
       </video>
