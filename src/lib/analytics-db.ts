@@ -1,29 +1,22 @@
-const SUPABASE_URL = process.env.ANALYTICS_SUPABASE_URL;
-const SUPABASE_KEY = process.env.ANALYTICS_SUPABASE_SERVICE_KEY;
+const WP_URL = process.env.WORDPRESS_URL;
+const ANALYTICS_SECRET = process.env.ANALYTICS_SECRET;
 
 export function isAnalyticsConfigured(): boolean {
-  return !!(SUPABASE_URL && SUPABASE_KEY);
+  return !!WP_URL;
 }
 
-async function sbFetch(path: string, options?: RequestInit): Promise<unknown> {
-  if (!SUPABASE_URL || !SUPABASE_KEY) return null;
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-      ...options,
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal",
-        ...(options?.headers ?? {}),
-      },
-    });
-    if (!res.ok) return null;
-    const text = await res.text();
-    return text ? JSON.parse(text) : null;
-  } catch {
-    return null;
-  }
+function wpFetch(path: string, options?: RequestInit): Promise<unknown> {
+  if (!WP_URL) return Promise.resolve(null);
+  return fetch(`${WP_URL}/wp-json/altr/v1/${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Analytics-Key": ANALYTICS_SECRET ?? "",
+      ...(options?.headers ?? {}),
+    },
+  })
+    .then(r => (r.ok ? r.json().catch(() => null) : null))
+    .catch(() => null);
 }
 
 export interface AnalyticsEvent {
@@ -53,15 +46,14 @@ export interface AnalyticsEvent {
 }
 
 export async function insertEvent(event: AnalyticsEvent): Promise<void> {
-  await sbFetch("analytics_events", { method: "POST", body: JSON.stringify(event) });
+  await wpFetch("analytics", { method: "POST", body: JSON.stringify(event) });
 }
 
 export type RawEvent = AnalyticsEvent & { id: number; created_at: string };
 
 export async function fetchEvents(fromIso: string, toIso: string): Promise<RawEvent[]> {
-  const result = await sbFetch(
-    `analytics_events?created_at=gte.${encodeURIComponent(fromIso)}&created_at=lte.${encodeURIComponent(toIso)}&order=created_at.desc&limit=50000`,
-    { headers: { Prefer: "return=representation" } }
+  const result = await wpFetch(
+    `analytics?from=${encodeURIComponent(fromIso)}&to=${encodeURIComponent(toIso)}`
   );
   return (result as RawEvent[] | null) ?? [];
 }
